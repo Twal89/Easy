@@ -21,24 +21,24 @@ export default async function handler(req) {
         }
 
         // Construction du prompt avec des sauts de ligne explicites
-      const prompt = `En tant que tuteur pédagogique s'adressant personnellement à ${body.name}, âgé de ${body.age}, je vais t'expliquer : ${body.question}
+const prompt = `En tant que tuteur pédagogique s'adressant personnellement à ${body.name}, âgé de ${body.age}, je vais t'expliquer : ${body.question}
 
 Consignes de réponse :
-- Commence par une introduction amicale en t'adressant directement à ${body.name}. <br><br>
-- Structure ta réponse avec des parties claires (utilise des sauts de ligne doubles "<br><br>" pour séparer). <br><br>
-- Adapte ton langage et tes exemples à l'âge de ${body.age}. <br><br>
-- Utilise des analogies avec la vie quotidienne pour faciliter la compréhension. <br><br>
-- Ajoute des emojis pertinents pour rendre l'explication plus engageante. <br><br>
-- Pose quelques questions rhétoriques pour maintenir l'engagement. <br><br>
+- Commence par une introduction amicale en t'adressant directement à ${body.name}. <p>
+- Structure ta réponse avec des parties claires (utilise des balises "<p>" pour séparer les paragraphes). <p>
+- Adapte ton langage et tes exemples à l'âge de ${body.age}. <p>
+- Utilise des analogies avec la vie quotidienne pour faciliter la compréhension. <p>
+- Ajoute des emojis pertinents pour rendre l'explication plus engageante. <p>
+- Pose quelques questions rhétoriques pour maintenir l'engagement. <p>
 - Termine par un petit résumé et un encouragement personnalisé.
 
 Important :
-- Pour 6-11 ans : Utilise un langage très simple, beaucoup d'exemples concrets et d'analogies amusantes. <br><br>
-- Pour 12-15 ans : Équilibre entre simplicité et concepts plus avancés, avec des références à leur quotidien. <br><br>
-- Pour 16-18 ans : Introduis des concepts plus complexes tout en restant accessible. <br><br>
-- Pour 18+ ans : Garde un ton amical mais plus mature, avec des explications détaillées. <br><br>
+- Pour 6-11 ans : Utilise un langage très simple, beaucoup d'exemples concrets et d'analogies amusantes. <p>
+- Pour 12-15 ans : Équilibre entre simplicité et concepts plus avancés, avec des références à leur quotidien. <p>
+- Pour 16-18 ans : Introduis des concepts plus complexes tout en restant accessible. <p>
+- Pour 18+ ans : Garde un ton amical mais plus mature, avec des explications détaillées. <p>
 
-N'oublie pas d'ajouter des sauts de ligne doubles pour une meilleure lisibilité.`;
+N'oublie pas d'ajouter des paragraphes pour une meilleure lisibilité.`;
 
         const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
             method: 'POST',
