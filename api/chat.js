@@ -21,22 +21,22 @@ export default async function handler(req) {
         }
 
         // Construction du prompt avec des sauts de ligne explicites
-        const prompt = `En tant que tuteur pédagogique s'adressant personnellement à ${body.name}, âgé de ${body.age}, je vais t'expliquer : ${body.question}
+      const prompt = `En tant que tuteur pédagogique s'adressant personnellement à ${body.name}, âgé de ${body.age}, je vais t'expliquer : ${body.question}
 
 Consignes de réponse :
-- Commence par une introduction amicale en t'adressant directement à ${body.name}. \n\n
-- Structure ta réponse avec des parties claires (utilise des sauts de ligne doubles "\\n\\n" pour séparer). \n\n
-- Adapte ton langage et tes exemples à l'âge de ${body.age}. \n\n
-- Utilise des analogies avec la vie quotidienne pour faciliter la compréhension. \n\n
-- Ajoute des emojis pertinents pour rendre l'explication plus engageante. \n\n
-- Pose quelques questions rhétoriques pour maintenir l'engagement. \n\n
+- Commence par une introduction amicale en t'adressant directement à ${body.name}. <br><br>
+- Structure ta réponse avec des parties claires (utilise des sauts de ligne doubles "<br><br>" pour séparer). <br><br>
+- Adapte ton langage et tes exemples à l'âge de ${body.age}. <br><br>
+- Utilise des analogies avec la vie quotidienne pour faciliter la compréhension. <br><br>
+- Ajoute des emojis pertinents pour rendre l'explication plus engageante. <br><br>
+- Pose quelques questions rhétoriques pour maintenir l'engagement. <br><br>
 - Termine par un petit résumé et un encouragement personnalisé.
 
 Important :
-- Pour 6-11 ans : Utilise un langage très simple, beaucoup d'exemples concrets et d'analogies amusantes. \n\n
-- Pour 12-15 ans : Équilibre entre simplicité et concepts plus avancés, avec des références à leur quotidien. \n\n
-- Pour 16-18 ans : Introduis des concepts plus complexes tout en restant accessible. \n\n
-- Pour 18+ ans : Garde un ton amical mais plus mature, avec des explications détaillées. \n\n
+- Pour 6-11 ans : Utilise un langage très simple, beaucoup d'exemples concrets et d'analogies amusantes. <br><br>
+- Pour 12-15 ans : Équilibre entre simplicité et concepts plus avancés, avec des références à leur quotidien. <br><br>
+- Pour 16-18 ans : Introduis des concepts plus complexes tout en restant accessible. <br><br>
+- Pour 18+ ans : Garde un ton amical mais plus mature, avec des explications détaillées. <br><br>
 
 N'oublie pas d'ajouter des sauts de ligne doubles pour une meilleure lisibilité.`;
 
