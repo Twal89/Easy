@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<!-- Version 1.0.4 -->
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
@@ -21,20 +20,27 @@
             white-space: pre-line;
             padding: 1rem;
         }
-        #explanation {
+        #chat-container {
             font-size: 1.1rem;
             text-align: justify;
         }
-        .quiz-answer {
+        .quiz-option {
             background-color: #f3f4f6;
-            border-radius: 0.5rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.75rem;
             padding: 1rem;
-            margin-top: 1rem;
+            margin: 0.5rem 0;
+            cursor: pointer;
+            transition: all 0.2s;
         }
-        #conversation {
-            border-top: 2px solid #e5e7eb;
-            padding-top: 1rem;
-            margin-top: 1rem;
+        .quiz-option:hover {
+            background-color: #e0e7ff;
+            border-color: #6366f1;
+        }
+        .quiz-option.selected {
+            background-color: #818cf8;
+            border-color: #6366f1;
+            color: white;
         }
         .response-bubble {
             background-color: #f3f4f6;
@@ -42,6 +48,7 @@
             padding: 1rem;
             margin: 0.5rem 0;
             max-width: 85%;
+            animation: fadeIn 0.5s ease-out;
         }
         .user-bubble {
             background-color: #e0e7ff;
@@ -51,28 +58,39 @@
             margin-left: auto;
             max-width: 85%;
             width: fit-content;
+            animation: fadeIn 0.5s ease-out;
         }
-        .loading-dots {
-            animation: dots 1.5s infinite;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .loading-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .loading-indicator::after {
+            content: '...';
+            animation: dots 1.5s steps(4, end) infinite;
+            width: 1.5em;
         }
         @keyframes dots {
-            0%, 20% { content: "🤔"; }
-            40% { content: "🤔 ."; }
-            60% { content: "🤔 .."; }
-            80% { content: "🤔 ..."; }
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60% { content: '...'; }
+            80%, 100% { content: ''; }
         }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen">
     <div class="container mx-auto px-4 py-8 max-w-md">
-        <!-- En-tête -->
         <header class="text-center mb-8">
             <h1 class="text-3xl font-bold text-gray-800 mb-2">Easy!</h1>
             <p class="text-gray-600">Apprendre devient simple et amusant ! 🎓</p>
         </header>
 
         <main class="bg-white rounded-lg p-6 custom-shadow">
-            <!-- Formulaire principal -->
+            <!-- Formulaire initial -->
             <form id="questionForm" class="space-y-6">
                 <div>
                     <label for="name" class="block text-sm font-medium text-gray-700 mb-2">Ton prénom</label>
@@ -99,23 +117,6 @@
                         placeholder="Pose ta question ici..."></textarea>
                 </div>
 
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Image (optionnel)</label>
-                    <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
-                        <div class="space-y-1 text-center">
-                            <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                                <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                            </svg>
-                            <div class="flex text-sm text-gray-600">
-                                <label for="file-upload" class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
-                                    <span>Télécharge une image</span>
-                                    <input id="file-upload" name="file-upload" type="file" accept="image/*" class="sr-only">
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
                 <button type="submit"
                     class="w-full gradient-bg text-white font-bold py-3 px-4 rounded-md hover:opacity-90 transition duration-300">
                     Obtenir l'explication 🚀
@@ -128,37 +129,24 @@
                     <!-- Les messages seront ajoutés ici -->
                 </div>
 
-                <!-- Zone de réponse au quiz -->
-                <div id="quiz-response" class="mt-4 hidden">
-                    <div class="flex flex-col space-y-2">
-                        <input type="text" id="quiz-answer" 
-                            class="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                            placeholder="Écris ta réponse ici...">
-                        <button onclick="submitQuizAnswer()" 
-                            class="bg-indigo-100 text-indigo-700 px-4 py-2 rounded-md hover:bg-indigo-200 transition duration-300">
-                            Envoyer ma réponse
-                        </button>
+                <!-- Zone de QCM -->
+                <div id="quiz-container" class="mt-4 hidden">
+                    <div id="quiz-options" class="space-y-3">
+                        <!-- Les options QCM seront ajoutées ici -->
                     </div>
-                </div>
-
-                <!-- Boutons d'action -->
-                <div class="flex space-x-4 mt-6">
-                    <button onclick="resetConversation()" 
-                        class="flex-1 bg-gray-100 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-200 transition duration-300">
-                        Nouvelle question 🔄
-                    </button>
-                    <button onclick="askFollowUp()" 
-                        class="flex-1 gradient-bg text-white px-4 py-2 rounded-md hover:opacity-90 transition duration-300">
-                        Approfondir 🚀
+                    <button id="submit-quiz" onclick="submitQuizAnswer()" 
+                        class="w-full mt-4 bg-indigo-100 text-indigo-700 px-4 py-2 rounded-md hover:bg-indigo-200 transition duration-300 hidden">
+                        Valider ma réponse
                     </button>
                 </div>
             </div>
         </main>
     </div>
 
-    <script>
+   <script>
         let userName = '';
         let userAge = '';
+        let selectedQuizOption = null;
 
         document.getElementById('questionForm').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -180,7 +168,7 @@
             // Afficher l'indicateur de chargement
             chatContainer.innerHTML += `
                 <div class="response-bubble" id="loading-message">
-                    <em>En train de réfléchir... 🤔</em>
+                    <span class="loading-indicator">Je réfléchis</span>
                 </div>
             `;
             
@@ -205,16 +193,23 @@
                 // Supprimer le message de chargement
                 document.getElementById('loading-message').remove();
             
-                // Ajouter la réponse
+                // Séparer l'explication et le QCM
+                const [mainExplanation, qcmPart] = explanation.split('[QCM]');
+
+                // Afficher l'explication principale
                 chatContainer.innerHTML += `
                     <div class="response-bubble">
-                        ${explanation.replace(/\n/g, '<br>')}
+                        ${mainExplanation.trim().replace(/\n/g, '<br>')}
                     </div>
                 `;
 
-                // Si la réponse contient une question, afficher la zone de réponse
-                if (explanation.includes('?')) {
-                    document.getElementById('quiz-response').classList.remove('hidden');
+                // Traiter et afficher le QCM
+                if (qcmPart) {
+                    const options = qcmPart.trim().split('\n')
+                        .filter(line => line.startsWith('-'))
+                        .map(line => line.replace('-', '').trim());
+                    
+                    displayQuizOptions(options);
                 }
 
             } catch (error) {
@@ -227,72 +222,52 @@
             }
         });
 
-        async function submitQuizAnswer() {
-            const answer = document.getElementById('quiz-answer').value;
-            const chatContainer = document.getElementById('chat-container');
+        function displayQuizOptions(options) {
+            const quizContainer = document.getElementById('quiz-container');
+            const quizOptions = document.getElementById('quiz-options');
             
-            if (answer.trim() !== '') {
-                // Afficher la réponse de l'utilisateur
-                chatContainer.innerHTML += `
-                    <div class="user-bubble">
-                        <strong>Ma réponse :</strong><br>
-                        ${answer}
-                    </div>
-                `;
+            quizOptions.innerHTML = options.map((option, index) => `
+                <div class="quiz-option" onclick="selectQuizOption(this, '${option.replace(/'/g, "\\'")}')" data-option="${option}">
+                    ${option}
+                </div>
+            `).join('');
 
-                // Afficher l'indicateur de chargement
-                chatContainer.innerHTML += `
-                    <div class="response-bubble" id="loading-message">
-                        <em>Je vérifie ta réponse... 🤔</em>
-                    </div>
-                `;
-                
-                try {
-                    const response = await fetch('/api/chat', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            name: userName,
-                            age: userAge,
-                            question: `J'ai répondu "${answer}" à ta question. Est-ce correct ? Peux-tu m'expliquer pourquoi ? Donne-moi plus de détails sur ce point.`
-                        })
-                    });
-                
-                    const data = await response.json();
-                    const feedback = data.choices[0].message.content;
-
-                    // Supprimer le message de chargement
-                    document.getElementById('loading-message').remove();
-                
-                    // Ajouter le feedback
-                    chatContainer.innerHTML += `
-                        <div class="response-bubble">
-                            ${feedback.replace(/\n/g, '<br>')}
-                        </div>
-                    `;
-                } catch (error) {
-                    console.error('Erreur:', error);
-                    document.getElementById('loading-message').remove();
-                    chatContainer.innerHTML += `
-                        <div class="response-bubble text-red-600">
-                            Désolé, une erreur s'est produite. Veuillez réessayer.
-                        </div>
-                    `;
-                }
-                
-                document.getElementById('quiz-answer').value = '';
-            }
+            document.getElementById('submit-quiz').classList.remove('hidden');
+            quizContainer.classList.remove('hidden');
         }
 
-        async function askFollowUp() {
-            const chatContainer = document.getElementById('chat-container');
+        function selectQuizOption(element, option) {
+            // Retirer la sélection précédente
+            document.querySelectorAll('.quiz-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
             
+            // Sélectionner la nouvelle option
+            element.classList.add('selected');
+            selectedQuizOption = option;
+            
+            // Activer le bouton de validation
+            document.getElementById('submit-quiz').classList.remove('hidden');
+        }
+
+        async function submitQuizAnswer() {
+            if (!selectedQuizOption) return;
+
+            const chatContainer = document.getElementById('chat-container');
+            const quizContainer = document.getElementById('quiz-container');
+            
+            // Afficher la réponse sélectionnée
+            chatContainer.innerHTML += `
+                <div class="user-bubble">
+                    <strong>Ma réponse :</strong><br>
+                    ${selectedQuizOption}
+                </div>
+            `;
+
             // Afficher l'indicateur de chargement
             chatContainer.innerHTML += `
                 <div class="response-bubble" id="loading-message">
-                    <em>Je prépare des explications plus approfondies... 🤔</em>
+                    <span class="loading-indicator">Je vérifie</span>
                 </div>
             `;
 
@@ -305,22 +280,51 @@
                     body: JSON.stringify({
                         name: userName,
                         age: userAge,
-                        question: "Je voudrais approfondir le sujet précédent. Peux-tu me donner plus de détails et des explications plus poussées, toujours adaptées à mon niveau ? N'oublie pas d'expliquer tous les termes techniques."
+                        question: `Response: "${selectedQuizOption}"`
                     })
                 });
             
                 const data = await response.json();
-                const deeperExplanation = data.choices[0].message.content;
+                const feedback = data.choices[0].message.content;
 
                 // Supprimer le message de chargement
                 document.getElementById('loading-message').remove();
-            
-                // Ajouter l'explication approfondie
+                
+                // Séparer le feedback et le nouveau QCM s'il existe
+                const [mainFeedback, newQcmPart] = feedback.split('[QCM]');
+
+                // Afficher le feedback
                 chatContainer.innerHTML += `
                     <div class="response-bubble">
-                        ${deeperExplanation.replace(/\n/g, '<br>')}
+                        ${mainFeedback.trim().replace(/\n/g, '<br>')}
                     </div>
                 `;
+
+                // Afficher le nouveau QCM ou les options de continuation
+                if (newQcmPart) {
+                    const newOptions = newQcmPart.trim().split('\n')
+                        .filter(line => line.startsWith('-'))
+                        .map(line => line.replace('-', '').trim());
+                    displayQuizOptions(newOptions);
+                } else {
+                    // Afficher les options de continuation
+                    chatContainer.innerHTML += `
+                        <div class="response-bubble">
+                            <p class="mb-3">Que veux-tu faire maintenant ?</p>
+                            <div class="grid gap-3">
+                                <button onclick="resetConversation()" 
+                                    class="text-left p-3 rounded-lg border hover:bg-indigo-50 transition-colors duration-200">
+                                    🔄 Poser une nouvelle question
+                                </button>
+                                <button onclick="askFollowUp()" 
+                                    class="text-left p-3 rounded-lg border hover:bg-indigo-50 transition-colors duration-200">
+                                    🚀 Approfondir ce sujet
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }
+
             } catch (error) {
                 console.error('Erreur:', error);
                 document.getElementById('loading-message').remove();
@@ -330,26 +334,25 @@
                     </div>
                 `;
             }
+
+            // Réinitialiser la sélection
+            selectedQuizOption = null;
+            quizContainer.classList.add('hidden');
         }
 
         function resetConversation() {
-            document.getElementById('questionForm').reset();
+            document.getElementById('question').value = '';
             document.getElementById('chat-container').innerHTML = '';
             document.getElementById('response').classList.add('hidden');
-            document.getElementById('quiz-response').classList.add('hidden');
+            document.getElementById('quiz-container').classList.add('hidden');
             window.scrollTo(0, 0);
         }
 
-        // Gestion de l'upload d'image
-        document.getElementById('file-upload').addEventListener('change', function(e) {
-            if (e.target.files && e.target.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    // Code pour la prévisualisation de l'image
-                };
-                reader.readAsDataURL(e.target.files[0]);
-            }
-        });
+        function askFollowUp() {
+            document.getElementById('question').value = "J'aimerais approfondir : ";
+            document.getElementById('question').focus();
+            window.scrollTo(0, 0);
+        }
     </script>
 </body>
 </html>
