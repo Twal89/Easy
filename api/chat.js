@@ -19,22 +19,25 @@ export default async function handler(req) {
 
         // Si c'est une réponse à un QCM
         if (body.question.startsWith('Response:')) {
-            const prompt = `En tant que tuteur pédagogique répondant à ${body.name}, évalue sa réponse : ${body.question}. 
-            
-            Consignes importantes :
-            1. Commence DIRECTEMENT par une réaction naturelle comme "Exactement !", "Pas tout à fait !", "Tu y es presque !" ou "Non, ce n'est pas ça."
-            2. Enchaîne avec l'explication détaillée sans transition forcée
-            3. TOUS les termes techniques doivent être expliqués simplement
-            4. Adapte ton langage à l'âge : ${body.age}
-            5. Utilise des analogies de la vie quotidienne
-            6. Termine par une nouvelle question QCM avec 3 choix
+            const prompt = `En tant que tuteur pédagogique super enthousiaste répondant à ${body.name}, évalue sa réponse au QCM : ${body.question}
 
-            Format de réponse souhaité :
-            1. Réaction + Explication
-            2. [QCM]
-            - Option A
-            - Option B
-            - Option C`;
+Instructions importantes :
+1. Commence DIRECTEMENT par une réaction spontanée et encourageante :
+   - Si correct : "Bravo ! 🌟", "Excellent ! ⭐", "Super ! 🎉"
+   - Si incorrect : "Pas tout à fait ! 🤔", "Presque ! ✨", "Essayons de voir ça ensemble ! 💡"
+2. Donne une explication détaillée et encourageante avec BEAUCOUP d'emojis
+3. Utilise des analogies simples et amusantes
+4. Garde un ton super positif et amical
+5. Termine par une nouvelle question QCM amusante
+
+Format de réponse souhaité :
+[Réaction] 🌟
+[Explication avec emojis]
+
+[Nouvelle Question] 📝
+A) [Option fun] 🔵
+B) [Option fun] 🟢
+C) [Option fun] 🟡`;
 
             const response = await fetch('https://api.openai.com/v1/chat/completions', {
                 method: 'POST',
@@ -54,15 +57,11 @@ export default async function handler(req) {
             });
 
             if (!response.ok) {
-                const error = await response.json();
-                throw new Error(`OpenAI API error: ${JSON.stringify(error)}`);
+                throw new Error(`OpenAI API error: ${await response.text()}`);
             }
 
             const data = await response.json();
-            return new Response(JSON.stringify({
-                ...data,
-                type: 'quiz-response'
-            }), {
+            return new Response(JSON.stringify(data), {
                 status: 200,
                 headers: {
                     'Content-Type': 'application/json',
@@ -71,22 +70,29 @@ export default async function handler(req) {
             });
         }
 
-        // Si c'est une nouvelle question
-        const initialPrompt = `En tant que tuteur pédagogique s'adressant à ${body.name} (${body.age}), explique : ${body.question}
+        // Pour une nouvelle question
+        const initialPrompt = `En tant que tuteur pédagogique super enthousiaste s'adressant à ${body.name} (${body.age}), explique de façon amusante et engageante : ${body.question}
 
-Instructions spécifiques :
-1. Commence par une introduction amicale et personnalisée
-2. CHAQUE terme technique DOIT être expliqué simplement
-3. Utilise des analogies avec la vie quotidienne
-4. Adapte le langage selon l'âge
-5. Termine par une question QCM avec 3 options
+Instructions essentielles :
+1. Commence par une introduction super accueillante avec des emojis 👋 ⭐
+2. Utilise BEAUCOUP d'emojis pertinents tout au long de l'explication 🌟 ✨
+3. Chaque concept doit être expliqué avec une analogie amusante du quotidien 🎯
+4. TOUS les termes techniques doivent être expliqués simplement 📚
+5. Adapte ton langage à l'âge tout en restant super dynamique 🎈
+6. Pose des mini-questions rhétoriques pour maintenir l'engagement 🤔
+7. Termine par un QCM ludique et amusant 🎮
 
-Format de réponse :
-1. Explication claire et structurée
-2. [QCM]
-- Option A
-- Option B
-- Option C`;
+Format de réponse souhaité :
+[Introduction amicale avec emojis]
+
+[Explication principale avec beaucoup d'emojis et d'analogies]
+
+[Question finale] 📝
+A) [Option fun] 🔵
+B) [Option fun] 🟢
+C) [Option fun] 🟡
+
+À toi de jouer ! ✨`;
 
         const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
             method: 'POST',
@@ -106,16 +112,12 @@ Format de réponse :
         });
 
         if (!openaiResponse.ok) {
-            const error = await openaiResponse.json();
-            throw new Error(`OpenAI API error: ${JSON.stringify(error)}`);
+            throw new Error(`OpenAI API error: ${await openaiResponse.text()}`);
         }
 
         const data = await openaiResponse.json();
         
-        return new Response(JSON.stringify({
-            ...data,
-            type: 'initial-response'
-        }), {
+        return new Response(JSON.stringify(data), {
             status: 200,
             headers: {
                 'Content-Type': 'application/json',
