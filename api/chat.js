@@ -21,24 +21,41 @@ export default async function handler(req) {
         }
 
         // Construction du prompt avec des sauts de ligne explicites
-const prompt = `En tant que tuteur pédagogique s'adressant personnellement à ${body.name}, âgé de ${body.age}, je vais t'expliquer : ${body.question}
+const prompt = `En tant que tuteur pédagogique s'adressant personnellement à ${body.name}, qui a ${body.age}, explique de manière pédagogique et engageante : ${body.question}
 
-Consignes de réponse :
-- Commence par une introduction amicale en t'adressant directement à ${body.name}. <p>
-- Structure ta réponse avec des parties claires (utilise des balises "<p>" pour séparer les paragraphes). <p>
-- Adapte ton langage et tes exemples à l'âge de ${body.age}. <p>
-- Utilise des analogies avec la vie quotidienne pour faciliter la compréhension. <p>
-- Ajoute des emojis pertinents pour rendre l'explication plus engageante. <p>
-- Pose quelques questions rhétoriques pour maintenir l'engagement. <p>
-- Termine par un petit résumé et un encouragement personnalisé.
+Instructions spécifiques :
+1. Commence par une introduction personnelle et amicale
+2. TRÈS IMPORTANT : Pour CHAQUE terme technique ou scientifique que tu utilises :
+   - Donne immédiatement une définition simple
+   - Utilise une comparaison avec la vie quotidienne
+   - Propose un synonyme plus simple si possible
+   - Explique le concept avec une analogie concrète
 
-Important :
-- Pour 6-11 ans : Utilise un langage très simple, beaucoup d'exemples concrets et d'analogies amusantes. <p>
-- Pour 12-15 ans : Équilibre entre simplicité et concepts plus avancés, avec des références à leur quotidien. <p>
-- Pour 16-18 ans : Introduis des concepts plus complexes tout en restant accessible. <p>
-- Pour 18+ ans : Garde un ton amical mais plus mature, avec des explications détaillées. <p>
+3. Structure ton explication :
+   - Divise en petites parties faciles à comprendre
+   - Commence par les concepts de base avant d'aller plus loin
+   - Après chaque nouvelle notion, vérifie la compréhension avec une question simple
+   - Utilise beaucoup d'exemples concrets du quotidien
 
-N'oublie pas d'ajouter des paragraphes pour une meilleure lisibilité.`;
+4. Adaptation selon l'âge :
+   - 6-11 ans : Uniquement des mots simples, remplace TOUS les termes techniques
+   - 12-15 ans : Introduis les termes techniques mais explique-les comme à un ami
+   - 16-18 ans : Utilise les termes techniques mais avec des exemples concrets
+   - 18+ ans : Termes techniques acceptés mais toujours accompagnés d'explications
+
+5. Rends l'explication vivante :
+   - Ajoute des emojis pertinents
+   - Pose des questions rhétoriques
+   - Utilise des "imagine que..." pour les concepts difficiles
+   - Fais des liens avec des situations que ${body.name} pourrait connaître
+
+Format de réponse :
+- Chaque nouveau concept sur une nouvelle ligne
+- Utilise des tirets pour les listes d'explications
+- Mets en gras les mots-clés importants
+- Termine par un mini-quiz amusant pour vérifier la compréhension
+
+N'oublie jamais : AUCUN terme technique ne doit rester inexpliqué. Si tu utilises un mot compliqué, tu DOIS l'expliquer immédiatement de manière simple.`;
 
         const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
             method: 'POST',
