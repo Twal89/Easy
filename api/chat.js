@@ -3,7 +3,6 @@ export const config = {
 };
 
 export default async function handler(req) {
-  // Vérification de la méthode
   if (req.method !== 'POST') {
     return new Response(JSON.stringify({ error: 'Method not allowed' }), {
       status: 405,
@@ -26,7 +25,7 @@ export default async function handler(req) {
         'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
       },
       body: JSON.stringify({
-        model: "gpt-4-turbo-preview",
+        model: "gpt-4-turbo", // Modifié ici pour utiliser la version stable
         messages: [{
           role: "user",
           content: `En tant que tuteur pédagogique s'adressant à ${name}, qui a le niveau ${age}, explique de manière adaptée et personnalisée : ${question}. Utilise un langage approprié à l'âge, des analogies pertinentes et des emojis pour rendre l'explication plus engageante.`
