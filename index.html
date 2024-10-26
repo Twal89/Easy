@@ -104,21 +104,23 @@
 
             try {
                 // Remplacez YOUR_API_KEY par votre véritable clé API ChatGPT
+
                 const response = await fetch('https://api.openai.com/v1/chat/completions', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': 'Bearer sk-K1jsCZ5n7tn6W0Ma1FbqR9FJbxFBLdjo7chdESsRsXT3BlbkFJ17XPV0uVpzl-rb2FFi2NvIUb1pr_YpwYrhGtlHHw0A'
+                        'Authorization': 'Bearer sk-K1jsCZ5n7tn6W0Ma1FbqR9FJbxFBLdjo7chdESsRsXT3BlbkFJ17XPV0uVpzl-rb2FFi2NvIUb1pr_YpwYrhGtlHHw0A' // Remplacez par votre nouvelle clé API
                     },
                     body: JSON.stringify({
-                        model: "gpt-3.5-turbo",
+                        model: "gpt-4-turbo-preview",
                         messages: [{
                             role: "user",
                             content: prompt
-                        }]
+                        }],
+                        temperature: 0.7
                     })
                 });
-
+             
                 const data = await response.json();
                 const explanation = data.choices[0].message.content;
 
