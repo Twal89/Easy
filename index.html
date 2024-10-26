@@ -25,45 +25,72 @@
             text-align: justify;
         }
         .quiz-option {
-            background-color: #f3f4f6;
             border: 2px solid #e5e7eb;
             border-radius: 0.75rem;
-            padding: 1rem;
-            margin: 0.5rem 0;
-            cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
         .quiz-option:hover {
-            background-color: #e0e7ff;
-            border-color: #6366f1;
+            border-color: #818cf8;
+            background-color: #f5f7ff;
+        }
+        .quiz-option input[type="radio"] {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            width: 1.2rem;
+            height: 1.2rem;
+            border: 2px solid #6366f1;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .quiz-option input[type="radio"]:checked {
+            background-color: #6366f1;
+        }
+        .quiz-option input[type="radio"]:checked::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 0.4rem;
+            height: 0.4rem;
+            background-color: white;
+            border-radius: 50%;
         }
         .quiz-option.selected {
-            background-color: #818cf8;
             border-color: #6366f1;
-            color: white;
+            background-color: #f0f7ff;
         }
         .response-bubble {
             background-color: #f3f4f6;
             border-radius: 1rem;
-            padding: 1rem;
-            margin: 0.5rem 0;
+            padding: 1.25rem;
+            margin: 0.75rem 0;
             max-width: 85%;
             animation: fadeIn 0.5s ease-out;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
         .user-bubble {
             background-color: #e0e7ff;
             border-radius: 1rem;
-            padding: 1rem;
-            margin: 0.5rem 0;
+            padding: 1.25rem;
+            margin: 0.75rem 0;
             margin-left: auto;
             max-width: 85%;
             width: fit-content;
             animation: fadeIn 0.5s ease-out;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
         .image-preview {
             max-width: 100%;
             border-radius: 0.5rem;
             margin-top: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
@@ -85,13 +112,30 @@
             60% { content: '...'; }
             80%, 100% { content: ''; }
         }
+        /* Styles pour les boutons d'action */
+        .action-button {
+            transition: all 0.3s ease;
+            transform: translateY(0);
+        }
+        .action-button:hover {
+            transform: translateY(-2px);
+        }
+        /* Animation pour les emojis */
+        .emoji-bounce {
+            display: inline-block;
+            animation: bounce 0.6s ease infinite;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
+        }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen">
     <div class="container mx-auto px-4 py-8 max-w-md">
         <header class="text-center mb-8">
             <h1 class="text-3xl font-bold text-gray-800 mb-2">Easy!</h1>
-            <p class="text-gray-600">Apprendre devient simple et amusant ! 🎓</p>
+            <p class="text-gray-600">Apprendre devient simple et amusant ! <span class="emoji-bounce">🎓</span></p>
         </header>
 
         <main class="bg-white rounded-lg p-6 custom-shadow">
@@ -145,7 +189,7 @@
 
                 <button type="submit"
                     class="w-full gradient-bg text-white font-bold py-3 px-4 rounded-md hover:opacity-90 transition duration-300">
-                    Obtenir l'explication 🚀
+                    Obtenir l'explication <span class="emoji-bounce">🚀</span>
                 </button>
             </form>
 
@@ -156,13 +200,27 @@
                 </div>
 
                 <!-- Zone de QCM -->
-                <div id="quiz-container" class="mt-4 hidden">
-                    <div id="quiz-options" class="space-y-3">
-                        <!-- Les options QCM seront ajoutées ici -->
+                <div id="quiz-container" class="mt-6 hidden">
+                    <div class="bg-white rounded-lg p-4 shadow-sm border border-indigo-100">
+                        <div id="quiz-options" class="space-y-3">
+                            <!-- Les options QCM seront générées ici -->
+                        </div>
+                        <button id="submit-quiz" onclick="submitQuizAnswer()" 
+                            class="w-full mt-4 gradient-bg text-white font-bold py-3 px-4 rounded-md hover:opacity-90 transition duration-300 hidden">
+                            Valider ma réponse <span class="emoji-bounce">✨</span>
+                        </button>
                     </div>
-                    <button id="submit-quiz" onclick="submitQuizAnswer()" 
-                        class="w-full mt-4 bg-indigo-100 text-indigo-700 px-4 py-2 rounded-md hover:bg-indigo-200 transition duration-300 hidden">
-                        Valider ma réponse ✨
+                </div>
+
+                <!-- Boutons d'action -->
+                <div id="action-buttons" class="mt-6 space-y-3 hidden">
+                    <button onclick="resetConversation()" 
+                        class="w-full py-3 px-4 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-lg transition-colors action-button">
+                        <span class="emoji-bounce">🔄</span> Nouvelle question
+                    </button>
+                    <button onclick="askFollowUp()" 
+                        class="w-full py-3 px-4 gradient-bg text-white rounded-lg hover:opacity-90 transition-colors action-button">
+                        <span class="emoji-bounce">🚀</span> Approfondir ce sujet
                     </button>
                 </div>
             </div>
@@ -175,7 +233,7 @@
         let selectedQuizOption = null;
         let imageData = null;
 
-        // Gestion de la prévisualisation de l'image
+        // Gestion de l'upload d'image
         document.getElementById('file-upload').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file) {
@@ -189,7 +247,10 @@
             }
         });
 
-        document.getElementById('questionForm').addEventListener('submit', async (e) => {
+        // Je continue avec le reste du JavaScript ?
+    </script>
+</body>
+document.getElementById('questionForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
             userName = document.getElementById('name').value;
@@ -198,28 +259,26 @@
             const responseDiv = document.getElementById('response');
             const chatContainer = document.getElementById('chat-container');
 
-            // Afficher la question de l'utilisateur avec l'image si présente
-            let questionHtml = `
+            // Afficher la question avec une animation
+            chatContainer.innerHTML += `
                 <div class="user-bubble">
-                    <strong>Question :</strong><br>
+                    <strong>Ma question :</strong><br>
                     ${question}
                 </div>
             `;
 
             if (imageData) {
-                questionHtml += `
+                chatContainer.innerHTML += `
                     <div class="user-bubble mt-2">
                         <img src="${imageData}" alt="Image fournie" class="image-preview">
                     </div>
                 `;
             }
 
-            chatContainer.innerHTML += questionHtml;
-
-            // Afficher l'indicateur de chargement
+            // Afficher l'animation de chargement
             chatContainer.innerHTML += `
                 <div class="response-bubble" id="loading-message">
-                    <span class="loading-indicator">Je réfléchis 🤔</span>
+                    <span class="loading-indicator">Je réfléchis <span class="emoji-bounce">🤔</span></span>
                 </div>
             `;
             
@@ -258,8 +317,8 @@
                 // Traiter et afficher le QCM
                 if (qcmPart) {
                     const options = qcmPart.trim().split('\n')
-                        .filter(line => line.startsWith('-'))
-                        .map(line => line.replace('-', '').trim());
+                        .filter(line => line.trim().startsWith('-') || line.trim().startsWith('A)') || line.trim().startsWith('B)') || line.trim().startsWith('C)'))
+                        .map(line => line.replace(/^[-ABC)\s]+/, '').trim());
                     
                     displayQuizOptions(options);
                 }
@@ -268,7 +327,7 @@
                 console.error('Erreur:', error);
                 chatContainer.innerHTML += `
                     <div class="response-bubble text-red-600">
-                        Désolé, une erreur s'est produite. Veuillez réessayer. 😕
+                        Oups ! Une erreur s'est produite. On réessaie ? <span class="emoji-bounce">😅</span>
                     </div>
                 `;
             }
@@ -279,27 +338,30 @@
             const quizOptions = document.getElementById('quiz-options');
             
             quizOptions.innerHTML = options.map((option, index) => `
-                <div class="quiz-option" onclick="selectQuizOption(this, '${option.replace(/'/g, "\\'")}')" data-option="${option}">
-                    ${option}
+                <div class="quiz-option">
+                    <label class="flex items-center p-4 cursor-pointer">
+                        <input type="radio" name="quiz-answer" value="${option}" 
+                            class="mr-3"
+                            onclick="handleOptionSelect(this)">
+                        <span>${String.fromCharCode(65 + index)}) ${option}</span>
+                    </label>
                 </div>
             `).join('');
 
-            document.getElementById('submit-quiz').classList.remove('hidden');
             quizContainer.classList.remove('hidden');
         }
 
-        function selectQuizOption(element, option) {
-            // Retirer la sélection précédente
-            document.querySelectorAll('.quiz-option').forEach(opt => {
-                opt.classList.remove('selected');
-            });
-            
-            // Sélectionner la nouvelle option
-            element.classList.add('selected');
-            selectedQuizOption = option;
-            
-            // Activer le bouton de validation
+        function handleOptionSelect(radio) {
+            selectedQuizOption = radio.value;
             document.getElementById('submit-quiz').classList.remove('hidden');
+
+            // Mise en évidence de l'option sélectionnée
+            document.querySelectorAll('.quiz-option').forEach(option => {
+                option.classList.remove('selected');
+                if (option.contains(radio)) {
+                    option.classList.add('selected');
+                }
+            });
         }
 
         async function submitQuizAnswer() {
@@ -308,7 +370,7 @@
             const chatContainer = document.getElementById('chat-container');
             const quizContainer = document.getElementById('quiz-container');
             
-            // Afficher la réponse sélectionnée
+            // Afficher la réponse de l'utilisateur
             chatContainer.innerHTML += `
                 <div class="user-bubble">
                     <strong>Ma réponse :</strong><br>
@@ -316,10 +378,10 @@
                 </div>
             `;
 
-            // Afficher l'indicateur de chargement
+            // Animation de chargement
             chatContainer.innerHTML += `
                 <div class="response-bubble" id="loading-message">
-                    <span class="loading-indicator">Je vérifie 🤔</span>
+                    <span class="loading-indicator">Je vérifie <span class="emoji-bounce">🤔</span></span>
                 </div>
             `;
 
@@ -339,7 +401,7 @@
                 const data = await response.json();
                 const feedback = data.choices[0].message.content;
 
-                // Supprimer le message de chargement
+                // Supprimer le chargement
                 document.getElementById('loading-message').remove();
                 
                 // Afficher le feedback
@@ -349,34 +411,20 @@
                     </div>
                 `;
 
-                // Afficher les options de continuation
-                chatContainer.innerHTML += `
-                    <div class="response-bubble mt-4">
-                        <p class="mb-3">Que veux-tu faire maintenant ? 🤔</p>
-                        <div class="grid gap-3">
-                            <button onclick="resetConversation()" 
-                                class="text-left p-3 rounded-lg border hover:bg-indigo-50 transition-colors duration-200">
-                                🔄 Poser une nouvelle question
-                            </button>
-                            <button onclick="askFollowUp()" 
-                                class="text-left p-3 rounded-lg border hover:bg-indigo-50 transition-colors duration-200">
-                                🚀 Approfondir ce sujet
-                            </button>
-                        </div>
-                    </div>
-                `;
+                // Afficher les boutons d'action
+                document.getElementById('action-buttons').classList.remove('hidden');
 
             } catch (error) {
                 console.error('Erreur:', error);
                 document.getElementById('loading-message').remove();
                 chatContainer.innerHTML += `
                     <div class="response-bubble text-red-600">
-                        Désolé, une erreur s'est produite. Veuillez réessayer. 😕
+                        Oups ! Une erreur s'est produite. On réessaie ? <span class="emoji-bounce">😅</span>
                     </div>
                 `;
             }
 
-            // Réinitialiser la sélection
+            // Réinitialiser et cacher le QCM
             selectedQuizOption = null;
             quizContainer.classList.add('hidden');
         }
@@ -386,13 +434,19 @@
             document.getElementById('chat-container').innerHTML = '';
             document.getElementById('response').classList.add('hidden');
             document.getElementById('quiz-container').classList.add('hidden');
+            document.getElementById('action-buttons').classList.add('hidden');
             document.getElementById('image-preview-container').classList.add('hidden');
             imageData = null;
             window.scrollTo(0, 0);
         }
 
         function askFollowUp() {
-            document.getElementById('question').value = "J'aimerais approfondir : ";
+            document.getElementById('chat-container').innerHTML += `
+                <div class="response-bubble">
+                    <p class="text-center mb-3">Super ! Pose-moi une autre question sur ce sujet ! <span class="emoji-bounce">🚀</span></p>
+                </div>
+            `;
+            document.getElementById('question').value = "";
             document.getElementById('question').focus();
             window.scrollTo(0, 0);
         }
