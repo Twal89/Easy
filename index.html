@@ -1,9 +1,13 @@
 <!DOCTYPE html>
+<!-- Version 1.0.2 -->
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Easy</title>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
     <style>
         .gradient-bg {
@@ -11,6 +15,16 @@
         }
         .custom-shadow {
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .explanation-text {
+            line-height: 1.8;
+            white-space: pre-line;
+            padding: 1rem;
+        }
+        
+        #explanation {
+            font-size: 1.1rem;
+            text-align: justify;
         }
     </style>
 </head>
@@ -80,7 +94,7 @@
             <!-- Zone de réponse -->
             <div id="response" class="mt-8 hidden">
                 <h3 class="text-lg font-medium text-gray-900 mb-4">Voici ton explication :</h3>
-                <div id="explanation" class="prose max-w-none bg-gray-50 rounded-lg p-4">
+                <div id="explanation" class="prose max-w-none bg-gray-50 rounded-lg p-4 explanation-text">
                     <!-- La réponse de l'API sera insérée ici -->
                 </div>
             </div>
@@ -98,9 +112,9 @@
             const responseDiv = document.getElementById('response');
             const explanationDiv = document.getElementById('explanation');
 
-            // Préparation des données pour l'API
-            let prompt = `En tant que tuteur pédagogique s'adressant à ${name}, qui a le niveau ${age}, explique de manière adaptée et personnalisée : ${question}. 
-            Utilise un langage approprié à l'âge, des analogies pertinentes et des emojis pour rendre l'explication plus engageante.`;
+            // Afficher le chargement
+            explanationDiv.innerHTML = "Chargement en cours...";
+            responseDiv.classList.remove('hidden');
 
             try {
                 const response = await fetch('/api/chat', {
@@ -118,13 +132,18 @@
                 const data = await response.json();
                 const explanation = data.choices[0].message.content;
             
-                explanationDiv.innerHTML = explanation;
-                responseDiv.classList.remove('hidden');
+                // Formatage amélioré de la réponse
+                explanationDiv.innerHTML = explanation
+                    .replace(/\n/g, '<br>')
+                    .replace(/<p>/g, '<br><br>')
+                    .replace(/\. /g, '. <br>');
+
+                // Ajout des classes pour le style
+                explanationDiv.classList.add('whitespace-pre-line', 'leading-relaxed', 'space-y-4');
 
             } catch (error) {
                 console.error('Erreur:', error);
                 explanationDiv.innerHTML = "Désolé, une erreur s'est produite. Veuillez réessayer.";
-                responseDiv.classList.remove('hidden');
             }
         });
 
