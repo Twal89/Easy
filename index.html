@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Version 1.0.3 -->
+<!-- Version 1.0.4 -->
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
@@ -41,6 +41,7 @@
             border-radius: 1rem;
             padding: 1rem;
             margin: 0.5rem 0;
+            max-width: 85%;
         }
         .user-bubble {
             background-color: #e0e7ff;
@@ -48,7 +49,17 @@
             padding: 1rem;
             margin: 0.5rem 0;
             margin-left: auto;
+            max-width: 85%;
             width: fit-content;
+        }
+        .loading-dots {
+            animation: dots 1.5s infinite;
+        }
+        @keyframes dots {
+            0%, 20% { content: "🤔"; }
+            40% { content: "🤔 ."; }
+            60% { content: "🤔 .."; }
+            80% { content: "🤔 ..."; }
         }
     </style>
 </head>
@@ -216,21 +227,108 @@
             }
         });
 
-        function submitQuizAnswer() {
+        async function submitQuizAnswer() {
             const answer = document.getElementById('quiz-answer').value;
             const chatContainer = document.getElementById('chat-container');
             
             if (answer.trim() !== '') {
+                // Afficher la réponse de l'utilisateur
                 chatContainer.innerHTML += `
                     <div class="user-bubble">
                         <strong>Ma réponse :</strong><br>
                         ${answer}
                     </div>
                 `;
+
+                // Afficher l'indicateur de chargement
+                chatContainer.innerHTML += `
+                    <div class="response-bubble" id="loading-message">
+                        <em>Je vérifie ta réponse... 🤔</em>
+                    </div>
+                `;
+                
+                try {
+                    const response = await fetch('/api/chat', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            name: userName,
+                            age: userAge,
+                            question: `J'ai répondu "${answer}" à ta question. Est-ce correct ? Peux-tu m'expliquer pourquoi ? Donne-moi plus de détails sur ce point.`
+                        })
+                    });
+                
+                    const data = await response.json();
+                    const feedback = data.choices[0].message.content;
+
+                    // Supprimer le message de chargement
+                    document.getElementById('loading-message').remove();
+                
+                    // Ajouter le feedback
+                    chatContainer.innerHTML += `
+                        <div class="response-bubble">
+                            ${feedback.replace(/\n/g, '<br>')}
+                        </div>
+                    `;
+                } catch (error) {
+                    console.error('Erreur:', error);
+                    document.getElementById('loading-message').remove();
+                    chatContainer.innerHTML += `
+                        <div class="response-bubble text-red-600">
+                            Désolé, une erreur s'est produite. Veuillez réessayer.
+                        </div>
+                    `;
+                }
                 
                 document.getElementById('quiz-answer').value = '';
-                // Cacher la zone de réponse après soumission
-                document.getElementById('quiz-response').classList.add('hidden');
+            }
+        }
+
+        async function askFollowUp() {
+            const chatContainer = document.getElementById('chat-container');
+            
+            // Afficher l'indicateur de chargement
+            chatContainer.innerHTML += `
+                <div class="response-bubble" id="loading-message">
+                    <em>Je prépare des explications plus approfondies... 🤔</em>
+                </div>
+            `;
+
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        name: userName,
+                        age: userAge,
+                        question: "Je voudrais approfondir le sujet précédent. Peux-tu me donner plus de détails et des explications plus poussées, toujours adaptées à mon niveau ? N'oublie pas d'expliquer tous les termes techniques."
+                    })
+                });
+            
+                const data = await response.json();
+                const deeperExplanation = data.choices[0].message.content;
+
+                // Supprimer le message de chargement
+                document.getElementById('loading-message').remove();
+            
+                // Ajouter l'explication approfondie
+                chatContainer.innerHTML += `
+                    <div class="response-bubble">
+                        ${deeperExplanation.replace(/\n/g, '<br>')}
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Erreur:', error);
+                document.getElementById('loading-message').remove();
+                chatContainer.innerHTML += `
+                    <div class="response-bubble text-red-600">
+                        Désolé, une erreur s'est produite. Veuillez réessayer.
+                    </div>
+                `;
             }
         }
 
@@ -239,13 +337,6 @@
             document.getElementById('chat-container').innerHTML = '';
             document.getElementById('response').classList.add('hidden');
             document.getElementById('quiz-response').classList.add('hidden');
-            window.scrollTo(0, 0);
-        }
-
-        function askFollowUp() {
-            const chatContainer = document.getElementById('chat-container');
-            document.getElementById('question').value = "J'aimerais en savoir plus sur : ";
-            document.getElementById('question').focus();
             window.scrollTo(0, 0);
         }
 
