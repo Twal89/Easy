@@ -247,10 +247,8 @@
             }
         });
 
-        // Je continue avec le reste du JavaScript ?
-    </script>
-</body>
-document.getElementById('questionForm').addEventListener('submit', async (e) => {
+        // Gestion du formulaire de question
+        document.getElementById('questionForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
             userName = document.getElementById('name').value;
