@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- Version 1.0.2 -->
+<!-- Version 1.0.3 -->
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Easy</title>
+    <title>Easy!</title>
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -21,31 +21,54 @@
             white-space: pre-line;
             padding: 1rem;
         }
-        
         #explanation {
             font-size: 1.1rem;
             text-align: justify;
+        }
+        .quiz-answer {
+            background-color: #f3f4f6;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+        #conversation {
+            border-top: 2px solid #e5e7eb;
+            padding-top: 1rem;
+            margin-top: 1rem;
+        }
+        .response-bubble {
+            background-color: #f3f4f6;
+            border-radius: 1rem;
+            padding: 1rem;
+            margin: 0.5rem 0;
+        }
+        .user-bubble {
+            background-color: #e0e7ff;
+            border-radius: 1rem;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            margin-left: auto;
+            width: fit-content;
         }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen">
     <div class="container mx-auto px-4 py-8 max-w-md">
+        <!-- En-tête -->
         <header class="text-center mb-8">
-            <h1 class="text-3xl font-bold text-gray-800 mb-2">Easy</h1>
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">Easy!</h1>
             <p class="text-gray-600">Apprendre devient simple et amusant ! 🎓</p>
         </header>
 
         <main class="bg-white rounded-lg p-6 custom-shadow">
             <!-- Formulaire principal -->
             <form id="questionForm" class="space-y-6">
-                <!-- Champ prénom -->
                 <div>
                     <label for="name" class="block text-sm font-medium text-gray-700 mb-2">Ton prénom</label>
                     <input type="text" id="name" name="name" required
                         class="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
                 </div>
 
-                <!-- Sélection d'âge -->
                 <div>
                     <label for="age" class="block text-sm font-medium text-gray-700 mb-2">Ton âge</label>
                     <select id="age" name="age" required
@@ -58,7 +81,6 @@
                     </select>
                 </div>
 
-                <!-- Zone de question -->
                 <div>
                     <label for="question" class="block text-sm font-medium text-gray-700 mb-2">Ta question</label>
                     <textarea id="question" name="question" rows="4" required
@@ -66,7 +88,6 @@
                         placeholder="Pose ta question ici..."></textarea>
                 </div>
 
-                <!-- Upload d'image -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Image (optionnel)</label>
                     <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
@@ -84,36 +105,74 @@
                     </div>
                 </div>
 
-                <!-- Bouton d'envoi -->
                 <button type="submit"
                     class="w-full gradient-bg text-white font-bold py-3 px-4 rounded-md hover:opacity-90 transition duration-300">
                     Obtenir l'explication 🚀
                 </button>
             </form>
 
-            <!-- Zone de réponse -->
+            <!-- Zone de conversation -->
             <div id="response" class="mt-8 hidden">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Voici ton explication :</h3>
-                <div id="explanation" class="prose max-w-none bg-gray-50 rounded-lg p-4 explanation-text">
-                    <!-- La réponse de l'API sera insérée ici -->
+                <div id="chat-container" class="space-y-4">
+                    <!-- Les messages seront ajoutés ici -->
+                </div>
+
+                <!-- Zone de réponse au quiz -->
+                <div id="quiz-response" class="mt-4 hidden">
+                    <div class="flex flex-col space-y-2">
+                        <input type="text" id="quiz-answer" 
+                            class="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                            placeholder="Écris ta réponse ici...">
+                        <button onclick="submitQuizAnswer()" 
+                            class="bg-indigo-100 text-indigo-700 px-4 py-2 rounded-md hover:bg-indigo-200 transition duration-300">
+                            Envoyer ma réponse
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Boutons d'action -->
+                <div class="flex space-x-4 mt-6">
+                    <button onclick="resetConversation()" 
+                        class="flex-1 bg-gray-100 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-200 transition duration-300">
+                        Nouvelle question 🔄
+                    </button>
+                    <button onclick="askFollowUp()" 
+                        class="flex-1 gradient-bg text-white px-4 py-2 rounded-md hover:opacity-90 transition duration-300">
+                        Approfondir 🚀
+                    </button>
                 </div>
             </div>
         </main>
     </div>
 
     <script>
+        let userName = '';
+        let userAge = '';
+
         document.getElementById('questionForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            const name = document.getElementById('name').value;
-            const age = document.getElementById('age').value;
+            userName = document.getElementById('name').value;
+            userAge = document.getElementById('age').value;
             const question = document.getElementById('question').value;
-            const fileInput = document.getElementById('file-upload');
             const responseDiv = document.getElementById('response');
-            const explanationDiv = document.getElementById('explanation');
+            const chatContainer = document.getElementById('chat-container');
 
-            // Afficher le chargement
-            explanationDiv.innerHTML = "Chargement en cours...";
+            // Afficher la question de l'utilisateur
+            chatContainer.innerHTML += `
+                <div class="user-bubble">
+                    <strong>Question :</strong><br>
+                    ${question}
+                </div>
+            `;
+
+            // Afficher l'indicateur de chargement
+            chatContainer.innerHTML += `
+                <div class="response-bubble" id="loading-message">
+                    <em>En train de réfléchir... 🤔</em>
+                </div>
+            `;
+            
             responseDiv.classList.remove('hidden');
 
             try {
@@ -123,36 +182,79 @@
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        name,
-                        age,
+                        name: userName,
+                        age: userAge,
                         question
                     })
                 });
             
                 const data = await response.json();
                 const explanation = data.choices[0].message.content;
-            
-                // Formatage amélioré de la réponse
-                explanationDiv.innerHTML = explanation
-                    .replace(/\n/g, '<br>')
-                    .replace(/<p>/g, '<br><br>')
-                    .replace(/\. /g, '. <br>');
 
-                // Ajout des classes pour le style
-                explanationDiv.classList.add('whitespace-pre-line', 'leading-relaxed', 'space-y-4');
+                // Supprimer le message de chargement
+                document.getElementById('loading-message').remove();
+            
+                // Ajouter la réponse
+                chatContainer.innerHTML += `
+                    <div class="response-bubble">
+                        ${explanation.replace(/\n/g, '<br>')}
+                    </div>
+                `;
+
+                // Si la réponse contient une question, afficher la zone de réponse
+                if (explanation.includes('?')) {
+                    document.getElementById('quiz-response').classList.remove('hidden');
+                }
 
             } catch (error) {
                 console.error('Erreur:', error);
-                explanationDiv.innerHTML = "Désolé, une erreur s'est produite. Veuillez réessayer.";
+                chatContainer.innerHTML += `
+                    <div class="response-bubble text-red-600">
+                        Désolé, une erreur s'est produite. Veuillez réessayer.
+                    </div>
+                `;
             }
         });
 
-        // Prévisualisation de l'image
+        function submitQuizAnswer() {
+            const answer = document.getElementById('quiz-answer').value;
+            const chatContainer = document.getElementById('chat-container');
+            
+            if (answer.trim() !== '') {
+                chatContainer.innerHTML += `
+                    <div class="user-bubble">
+                        <strong>Ma réponse :</strong><br>
+                        ${answer}
+                    </div>
+                `;
+                
+                document.getElementById('quiz-answer').value = '';
+                // Cacher la zone de réponse après soumission
+                document.getElementById('quiz-response').classList.add('hidden');
+            }
+        }
+
+        function resetConversation() {
+            document.getElementById('questionForm').reset();
+            document.getElementById('chat-container').innerHTML = '';
+            document.getElementById('response').classList.add('hidden');
+            document.getElementById('quiz-response').classList.add('hidden');
+            window.scrollTo(0, 0);
+        }
+
+        function askFollowUp() {
+            const chatContainer = document.getElementById('chat-container');
+            document.getElementById('question').value = "J'aimerais en savoir plus sur : ";
+            document.getElementById('question').focus();
+            window.scrollTo(0, 0);
+        }
+
+        // Gestion de l'upload d'image
         document.getElementById('file-upload').addEventListener('change', function(e) {
             if (e.target.files && e.target.files[0]) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    // Vous pouvez ajouter ici le code pour afficher l'aperçu de l'image
+                    // Code pour la prévisualisation de l'image
                 };
                 reader.readAsDataURL(e.target.files[0]);
             }
