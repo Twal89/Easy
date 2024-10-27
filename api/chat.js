@@ -17,19 +17,26 @@ export default async function handler(req) {
             throw new Error('API key not configured');
         }
 
-        // Adapter le ton et insister sur les réponses fluides et contextuelles
-        let introMessage = `En tant que tuteur pédagogique, continue la conversation de manière fluide et engageante avec ${body.name} (${body.age}). Réponds à sa question avec des explications claires et détaillées : ${body.question}.
-        
-        - Les réponses doivent être cohérentes avec les messages précédents, sans réintroduire formellement le nom de l'utilisateur.
-        - Assure-toi que chaque réponse fait un lien logique avec le fil de la discussion précédente.
-        - Identifie et souligne les termes techniques avec des balises [TERM] et [/TERM].
-        - Structure la réponse en paragraphes bien distincts avec des emojis si nécessaire.
-        - Utilise un ton adapté à l'âge (${body.age}).
+        // Pour la première question : inclure une introduction formelle
+        let firstMessage = '';
+        if (body.messages.length === 0) {
+            firstMessage = `Salut ${body.name}! 🌟 Je suis super content de t'aider aujourd'hui! Tu veux savoir quelque chose sur "${body.question}" ? Allons-y ! 👇`;
+        }
 
-        Voici l'historique de la conversation :`;
+        // Adapter le ton à l'âge de l'utilisateur
+        let ageAdaptation = '';
+        if (body.age === 'enfant') {
+            ageAdaptation = `Utilise des termes simples et des analogies amusantes pour expliquer ce qu'est ${body.question}. Si des mots compliqués comme "gravité" sont utilisés, assure-toi de les expliquer.`;
+        } else if (body.age === 'ado') {
+            ageAdaptation = `Adapte ton explication pour un adolescent. Utilise des exemples modernes et évite les mots trop compliqués, mais n'hésite pas à introduire des concepts un peu plus détaillés.`;
+        } else if (body.age === 'lyceen') {
+            ageAdaptation = `Explique ${body.question} de manière détaillée avec des termes scientifiques, mais assure-toi de les expliquer simplement si nécessaire. Utilise des exemples pertinents.`;
+        } else if (body.age === 'adulte') {
+            ageAdaptation = `Réponds de manière précise et détaillée, sans infantiliser l'utilisateur. Utilise des explications claires avec des exemples concrets et des termes techniques si nécessaire.`;
+        }
 
         const messages = [
-            { role: 'system', content: introMessage },
+            { role: 'system', content: `${firstMessage} ${ageAdaptation}` },
             ...body.messages // Historique des messages
         ];
 
@@ -54,10 +61,7 @@ export default async function handler(req) {
 
         const data = await openaiResponse.json();
 
-        // Ajouter un console.log pour voir la réponse renvoyée par GPT
-        console.log(data.response);
-
-        // Retourner la réponse de GPT avec les mots techniques soulignés
+        // Retourner la réponse de GPT avec l'adaptation selon l'âge
         return new Response(JSON.stringify({
             response: data.choices[0].message.content,
             messages: [...body.messages, { role: 'assistant', content: data.choices[0].message.content }]
