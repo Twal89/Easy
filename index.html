@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Easy!</title>
+    <title>Easy Chat</title>
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -15,129 +15,56 @@
         .custom-shadow {
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
-        .explanation-text {
-            line-height: 1.8;
-            white-space: pre-line;
+        .chat-container {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #e5e7eb;
             padding: 1rem;
+            border-radius: 0.5rem;
         }
-        #chat-container {
-            font-size: 1.1rem;
-            text-align: justify;
-        }
-
-        /* Styles spécifiques pour le QCM */
-        .quiz-option {
-            border: 2px solid #e5e7eb;
-            border-radius: 0.75rem;
-            margin-bottom: 0.75rem;
-            overflow: hidden;
-            transition: all 0.3s ease;
-        }
-
-        .quiz-option label {
-            display: flex;
-            align-items: center;
-            padding: 1rem;
-            cursor: pointer;
-            width: 100%;
-        }
-
-        .quiz-option:hover {
-            border-color: #818cf8;
-            background-color: #f5f7ff;
-        }
-
-        .quiz-option input[type="radio"] {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 1.5rem;
-            height: 1.5rem;
-            border: 2px solid #6366f1;
-            border-radius: 50%;
-            margin-right: 1rem;
-            position: relative;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .quiz-option input[type="radio"]:checked {
-            background-color: #6366f1;
-        }
-
-        .quiz-option input[type="radio"]:checked::before {
-            content: "";
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 0.5rem;
-            height: 0.5rem;
-            background-color: white;
-            border-radius: 50%;
-        }
-
-        .quiz-option.selected {
-            border-color: #6366f1;
-            background-color: #f0f7ff;
-        }
-
-        .response-bubble {
-            background-color: #f3f4f6;
-            border-radius: 1rem;
-            padding: 1.25rem;
-            margin: 0.75rem 0;
-            max-width: 85%;
-            animation: fadeIn 0.5s ease-out;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-
         .user-bubble {
             background-color: #e0e7ff;
             border-radius: 1rem;
             padding: 1.25rem;
             margin: 0.75rem 0;
+            max-width: 85%;
             margin-left: auto;
+            width: fit-content;
+            animation: fadeIn 0.5s ease-out;
+        }
+        .assistant-bubble {
+            background-color: #f3f4f6;
+            border-radius: 1rem;
+            padding: 1.25rem;
+            margin: 0.75rem 0;
             max-width: 85%;
             width: fit-content;
             animation: fadeIn 0.5s ease-out;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
-
-        .image-preview {
-            max-width: 100%;
-            border-radius: 0.5rem;
-            margin-top: 1rem;
-        }
-
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
         .loading-indicator {
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
         }
-
         .loading-indicator::after {
             content: '...';
             animation: dots 1.5s steps(4, end) infinite;
             width: 1.5em;
         }
-
         @keyframes dots {
             0%, 20% { content: '.'; }
             40% { content: '..'; }
             60% { content: '...'; }
             80%, 100% { content: ''; }
         }
-
         .emoji-bounce {
             display: inline-block;
             animation: bounce 0.6s ease infinite;
         }
-
         @keyframes bounce {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-3px); }
@@ -146,10 +73,9 @@
 </head>
 <body class="bg-gray-100 min-h-screen">
     <div class="container mx-auto px-4 py-8 max-w-md">
-            <header class="text-center mb-8">
-                <!-- Logo centré et agrandi -->
-                <img src="Logo_Easy-removebg-preview.png" alt="Easy logo" class="mx-auto h-40 w-auto"> <!-- Taille du logo ajustée -->
-            </header>
+        <header class="text-center mb-8">
+            <img src="Logo_Easy-removebg-preview.png" alt="Easy logo" class="mx-auto h-32 w-auto">
+        </header>
 
         <main class="bg-white rounded-lg p-6 custom-shadow">
             <!-- Formulaire initial -->
@@ -179,296 +105,109 @@
                         placeholder="Pose ta question ici..."></textarea>
                 </div>
 
-                <!-- Upload d'image -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Image (optionnel)</label>
-                    <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
-                        <div class="space-y-1 text-center">
-                            <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                                <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                            </svg>
-                            <div class="flex text-sm text-gray-600">
-                                <label for="file-upload" class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
-                                    <span>Télécharge une image</span>
-                                    <input id="file-upload" name="file-upload" type="file" accept="image/*" class="sr-only">
-                                </label>
-                            </div>
-                            <div id="image-preview-container" class="mt-2 hidden">
-                                <img id="image-preview" class="image-preview">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
                 <button type="submit"
                     class="w-full gradient-bg text-white font-bold py-3 px-4 rounded-md hover:opacity-90 transition duration-300">
                     Obtenir l'explication <span class="emoji-bounce">🚀</span>
                 </button>
             </form>
 
-            <!-- Zone de conversation -->
+            <!-- Zone de chat -->
             <div id="response" class="mt-8 hidden">
-                <div id="chat-container" class="space-y-4">
-                    <!-- Les messages seront ajoutés ici -->
+                <div id="chatContainer" class="chat-container space-y-4">
+                    <!-- Les messages du chat seront ajoutés ici -->
                 </div>
 
-                <!-- Zone de QCM -->
-                <div id="quiz-container" class="mt-6 hidden">
-                    <div class="bg-white rounded-lg p-4 shadow-sm border border-indigo-100">
-                        <div class="mb-4 font-medium text-gray-900">
-                            <!-- La question sera ajoutée ici -->
-                        </div>
-                        <div id="quiz-options" class="space-y-3">
-                            <!-- Les options QCM seront ajoutées ici -->
-                        </div>
-                        <button id="submit-quiz" onclick="submitQuizAnswer()" 
-                            class="w-full mt-4 gradient-bg text-white font-bold py-3 px-4 rounded-md hover:opacity-90 transition duration-300 hidden">
-                            Valider ma réponse <span class="emoji-bounce">✨</span>
-                        </button>
-                    </div>
-                </div>
+                <form id="chatForm" class="mt-4">
+                    <input type="text" id="userMessage" class="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Tapez votre message...">
+                    <button type="submit" class="w-full gradient-bg text-white font-bold py-3 px-4 rounded-md hover:opacity-90 transition duration-300 mt-2">Envoyer</button>
+                </form>
             </div>
         </main>
     </div>
+
     <script>
-        let userName = '';
-        let userAge = '';
-        let selectedQuizOption = null;
-        let imageData = null;
+        const messages = []; // Initialiser l'historique des messages
 
-        // Gestion de l'upload d'image
-        document.getElementById('file-upload').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    imageData = e.target.result;
-                    document.getElementById('image-preview').src = imageData;
-                    document.getElementById('image-preview-container').classList.remove('hidden');
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-
-        // Gestion du formulaire principal
+        // Gestion du formulaire principal (première question)
         document.getElementById('questionForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            userName = document.getElementById('name').value;
-            userAge = document.getElementById('age').value;
+            const name = document.getElementById('name').value;
+            const age = document.getElementById('age').value;
             const question = document.getElementById('question').value;
-            const responseDiv = document.getElementById('response');
-            const chatContainer = document.getElementById('chat-container');
 
-            // Afficher la question
-            chatContainer.innerHTML += `
-                <div class="user-bubble">
-                    <strong>Ma question :</strong><br>
-                    ${question}
-                </div>
-            `;
+            // Ajouter le premier message dans l'historique
+            messages.push({ role: 'user', content: question });
 
-            if (imageData) {
-                chatContainer.innerHTML += `
-                    <div class="user-bubble mt-2">
-                        <img src="${imageData}" alt="Image fournie" class="image-preview">
-                    </div>
-                `;
-            }
+            // Afficher la question de l'utilisateur dans l'interface
+            displayMessage('user', question);
 
-            // Afficher le chargement
-            chatContainer.innerHTML += `
-                <div class="response-bubble" id="loading-message">
-                    <span class="loading-indicator">Je réfléchis <span class="emoji-bounce">🤔</span></span>
-                </div>
-            `;
-            
-            responseDiv.classList.remove('hidden');
+            // Appeler l'API pour obtenir une réponse
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: name,
+                    age: age,
+                    question: question,
+                    messages: messages
+                })
+            });
 
-            try {
-                const response = await fetch('/api/chat', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        name: userName,
-                        age: userAge,
-                        question,
-                        hasImage: !!imageData
-                    })
-                });
-            
-                const data = await response.json();
-                const explanation = data.choices[0].message.content;
+            const data = await response.json();
 
-                // Supprimer le chargement
-                document.getElementById('loading-message').remove();
-            
-                // Séparer l'explication du QCM
-                const parts = explanation.split('[QCM]');
-                const mainExplanation = parts[0];
-                const qcmPart = parts[1];
+            // Ajouter la réponse de GPT à l'historique et à l'interface
+            messages.push({ role: 'assistant', content: data.response });
+            displayMessage('assistant', data.response);
 
-                // Afficher l'explication
-                chatContainer.innerHTML += `
-                    <div class="response-bubble">
-                        ${mainExplanation.trim().replace(/\n/g, '<br>')}
-                    </div>
-                `;
-
-                // Traiter et afficher le QCM si présent
-                if (qcmPart) {
-                    const lines = qcmPart.trim().split('\n');
-                    const question = lines[0].replace('Question :', '').trim();
-                    const options = lines.slice(1)
-                        .filter(line => line.trim().startsWith('-'))
-                        .map(line => line.replace(/^-\s*/, '').trim());
-                    
-                    displayQuizOptions(question, options);
-                }
-
-            } catch (error) {
-                console.error('Erreur:', error);
-                document.getElementById('loading-message').remove();
-                chatContainer.innerHTML += `
-                    <div class="response-bubble text-red-600">
-                        Oups ! Une erreur s'est produite. On réessaie ? <span class="emoji-bounce">😅</span>
-                    </div>
-                `;
-            }
+            // Rendre visible la zone de chat pour la suite
+            document.getElementById('response').classList.remove('hidden');
         });
 
-        function displayQuizOptions(question, options) {
-            const quizContainer = document.getElementById('quiz-container');
-            const quizOptions = document.getElementById('quiz-options');
-            
-            // Nettoyer les options existantes
-            quizOptions.innerHTML = '';
-            
-            // Ajouter la question
-            quizOptions.insertAdjacentHTML('beforebegin', `
-                <div class="mb-4 font-medium text-gray-900">
-                    ${question} 📝
-                </div>
-            `);
-            
-            // Ajouter les options
-            options.forEach((option, index) => {
-                const optionElement = document.createElement('div');
-                optionElement.className = 'quiz-option';
-                optionElement.innerHTML = `
-                    <label class="flex items-center w-full">
-                        <input type="radio" 
-                            name="quiz-answer" 
-                            value="${option}"
-                            class="mr-3"
-                            onclick="handleOptionSelect(this)">
-                        <span class="flex-1">
-                            ${String.fromCharCode(65 + index)}) ${option}
-                        </span>
-                    </label>
-                `;
-                quizOptions.appendChild(optionElement);
+        // Gestion du chat pour continuer la conversation
+        document.getElementById('chatForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const userMessage = document.getElementById('userMessage').value;
+            document.getElementById('userMessage').value = '';
+
+            // Ajouter le message de l'utilisateur à l'historique
+            messages.push({ role: 'user', content: userMessage });
+
+            // Afficher le message de l'utilisateur dans l'interface
+            displayMessage('user', userMessage);
+
+            // Appeler l'API pour obtenir une réponse
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: 'Utilisateur',
+                    age: document.getElementById('age').value,
+                    question: userMessage,
+                    messages: messages
+                })
             });
 
-            quizContainer.classList.remove('hidden');
-        }
+            const data = await response.json();
 
-        function handleOptionSelect(radio) {
-            selectedQuizOption = radio.value;
+            // Ajouter la réponse de GPT à l'historique et à l'interface
+            messages.push({ role: 'assistant', content: data.response });
+            displayMessage('assistant', data.response);
+        });
 
-            // Mise à jour visuelle
-            document.querySelectorAll('.quiz-option').forEach(option => {
-                option.classList.remove('selected');
-            });
-            radio.closest('.quiz-option').classList.add('selected');
-
-            // Afficher le bouton de validation
-            document.getElementById('submit-quiz').classList.remove('hidden');
-        }
-
-        async function submitQuizAnswer() {
-            if (!selectedQuizOption) return;
-
-            const chatContainer = document.getElementById('chat-container');
-            const quizContainer = document.getElementById('quiz-container');
-            
-            // Afficher la réponse sélectionnée
-            chatContainer.innerHTML += `
-                <div class="user-bubble">
-                    <strong>Ma réponse :</strong><br>
-                    ${selectedQuizOption}
-                </div>
-            `;
-
-            // Animation de chargement
-            chatContainer.innerHTML += `
-                <div class="response-bubble" id="loading-message">
-                    <span class="loading-indicator">Je vérifie <span class="emoji-bounce">🤔</span></span>
-                </div>
-            `;
-
-            try {
-                const response = await fetch('/api/chat', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        name: userName,
-                        age: userAge,
-                        question: `Response: "${selectedQuizOption}"`
-                    })
-                });
-            
-                const data = await response.json();
-                const feedback = data.choices[0].message.content;
-
-                // Supprimer le chargement
-                document.getElementById('loading-message').remove();
-                
-                // Afficher le feedback
-                chatContainer.innerHTML += `
-                    <div class="response-bubble">
-                        ${feedback.replace(/\n/g, '<br>')}
-                    </div>
-                `;
-
-                // Réinitialiser
-                selectedQuizOption = null;
-                quizContainer.classList.add('hidden');
-
-            } catch (error) {
-                console.error('Erreur:', error);
-                document.getElementById('loading-message').remove();
-                chatContainer.innerHTML += `
-                    <div class="response-bubble text-red-600">
-                        Oups ! Une erreur s'est produite. On réessaie ? <span class="emoji-bounce">😅</span>
-                    </div>
-                `;
-            }
-        }
-
-        function resetConversation() {
-            document.getElementById('question').value = '';
-            document.getElementById('chat-container').innerHTML = '';
-            document.getElementById('response').classList.add('hidden');
-            document.getElementById('quiz-container').classList.add('hidden');
-            document.getElementById('image-preview-container').classList.add('hidden');
-            imageData = null;
-            window.scrollTo(0, 0);
-        }
-
-        function askFollowUp() {
-            document.getElementById('chat-container').innerHTML += `
-                <div class="response-bubble">
-                    <p class="text-center mb-3">Super ! Pose-moi une autre question sur ce sujet ! <span class="emoji-bounce">🚀</span></p>
-                </div>
-            `;
-            document.getElementById('question').value = "";
-            document.getElementById('question').focus();
-            window.scrollTo(0, 0);
+        // Fonction pour afficher les messages dans le chat
+        function displayMessage(role, content) {
+            const chatContainer = document.getElementById('chatContainer');
+            const messageElement = document.createElement('div');
+            messageElement.classList.add(role === 'user' ? 'user-bubble' : 'assistant-bubble');
+            messageElement.textContent = content;
+            chatContainer.appendChild(messageElement);
+            chatContainer.scrollTop = chatContainer.scrollHeight; // Scroller vers le bas
         }
     </script>
 </body>
