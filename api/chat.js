@@ -18,46 +18,48 @@ export default async function handler(req) {
         }
 
         // Adapter le ton en fonction de l'âge de l'utilisateur
-        let introMessage = `En tant que tuteur pédagogique s'adressant à ${body.name} (${body.age}), explique de façon claire et engageante : ${body.question}.`;
+        let introMessage = `En tant que tuteur pédagogique s'adressant à ${body.name} (${body.age}), explique de façon claire, structurée et engageante : ${body.question}.`;
 
         if (body.age === 'enfant') {
             introMessage += `
 Instructions pour un enfant :
-1. Utilise un ton très enthousiaste avec BEAUCOUP d'emojis et des analogies amusantes 🎉.
+1. Utilise un ton très enthousiaste avec BEAUCOUP d'emojis 🎉.
 2. Explique les concepts en utilisant des phrases simples et courtes.
-3. Pose des mini-questions ("Tu veux en savoir plus ? 😊").
-4. Utilise des comparaisons amusantes (ex. jouets, animaux, jeux).`;
+3. Inclure des sous-titres sous forme de questions pour garder leur attention.
+4. Utilise des listes à puces et des termes en **gras** pour les rendre plus accessibles.`
 
         } else if (body.age === 'ado') {
             introMessage += `
 Instructions pour un adolescent :
 1. Utilise un ton amical et encourageant 💡.
-2. Utilise des analogies pertinentes (sports, technologie).
-3. Introduis des termes techniques simples en les expliquant brièvement.`;
+2. Explique les concepts avec des analogies pertinentes.
+3. Ajoute des sous-titres pour structurer l'information.
+4. Utilise des exemples pratiques, des listes et des mots importants en **gras**.`
 
         } else if (body.age === 'lyceen') {
             introMessage += `
 Instructions pour un lycéen :
 1. Utilise un ton respectueux et structuré 📚.
-2. Explique les concepts avec un peu plus de profondeur.
-3. Utilise des exemples et des analogies plus sophistiqués.`;
+2. Introduis des concepts plus avancés en les expliquant simplement.
+3. Utilise des titres pour introduire des sections et des listes à puces pour résumer les idées clés.
+4. Utilise des exemples concrets et des éléments en **gras** pour les points essentiels.`
 
         } else if (body.age === 'adulte') {
             introMessage += `
 Instructions pour un adulte :
-1. Utilise un ton amical et accessible tout en restant informatif 🌍.
-2. Structure l'explication en plusieurs points clairs et détaillés.
-3. Utilise des exemples concrets de la vie quotidienne.
-4. Inclure quelques emojis pour garder une touche conviviale.`;
+1. Utilise un ton amical et professionnel 🌍.
+2. Structure l'explication en plusieurs sections avec des sous-titres.
+3. Utilise des **points en gras**, des puces et des exemples concrets pour rendre l'explication plus fluide et lisible.
+4. Utilise quelques emojis pour rendre l'explication plus conviviale, mais sans exagération.`;
         }
-        
-        // Ajouter l'historique des messages
+
+        // Historique des messages
         const messages = [
-            { role: 'system', content: introMessage }, // Message initial avec le ton
-            ...body.messages // Historique des messages passés
+            { role: 'system', content: introMessage },
+            ...body.messages
         ];
 
-        // Appel à l'API OpenAI avec l'historique des messages
+        // Appel à l'API OpenAI
         const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
             method: 'POST',
             headers: {
@@ -65,7 +67,7 @@ Instructions pour un adulte :
                 'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
             },
             body: JSON.stringify({
-                model: "gpt-4o",
+                model: "gpt-4",
                 messages: messages,
                 temperature: 0.7,
                 max_tokens: 800
@@ -77,11 +79,11 @@ Instructions pour un adulte :
         }
 
         const data = await openaiResponse.json();
-        
-        // Retourner la réponse de GPT
+
+        // Retourner la réponse formatée
         return new Response(JSON.stringify({
             response: data.choices[0].message.content,
-            messages: [...body.messages, { role: 'assistant', content: data.choices[0].message.content }] // Ajout de la réponse dans l'historique
+            messages: [...body.messages, { role: 'assistant', content: data.choices[0].message.content }]
         }), {
             status: 200,
             headers: {
