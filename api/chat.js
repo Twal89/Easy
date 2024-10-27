@@ -17,12 +17,11 @@ export default async function handler(req) {
             throw new Error('API key not configured');
         }
 
-        // Adapter le ton en fonction de l'âge de l'utilisateur
+        // Adapter le ton en fonction de l'âge de l'utilisateur et détecter les termes techniques
         let introMessage = `En tant que tuteur pédagogique s'adressant à ${body.name} (${body.age}), explique de façon claire et engageante : ${body.question}.
-
-        Instructions :
+        
         - Détecte automatiquement les mots techniques ou complexes dans ta réponse.
-        - Répertorie les mots techniques à part en les entourant de balises [TERM] dans ta réponse.
+        - Répertorie les mots techniques en les entourant de balises [TERM] et [/TERM].
         - Garde un ton adapté à l'âge (${body.age}) et à la question initiale.`;
 
         const messages = [
@@ -46,12 +45,12 @@ export default async function handler(req) {
         });
 
         if (!openaiResponse.ok) {
-            throw new Error(`OpenAI API error: ${await openaiResponse.text()}`);
+            throw new Error(`OpenAI API error: ${await response.text()}`);
         }
 
         const data = await openaiResponse.json();
 
-        // Retourner la réponse de GPT, y compris les mots techniques détectés
+        // Retourner la réponse de GPT avec les mots techniques
         return new Response(JSON.stringify({
             response: data.choices[0].message.content,
             messages: [...body.messages, { role: 'assistant', content: data.choices[0].message.content }]
