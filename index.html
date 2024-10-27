@@ -115,6 +115,20 @@
             });
         }
 
+        // Fonction pour afficher les messages dans le chat
+        function displayMessage(role, content) {
+            const chatContainer = document.getElementById('chatContainer');
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('chat-bubble', role === 'user' ? 'user-bubble' : 'assistant-bubble');
+
+            // Appliquer la mise en forme des termes techniques avant d'afficher
+            const formattedContent = formatTechnicalTerms(content.trim().replace(/\n/g, '<br>')); 
+            messageElement.innerHTML = formattedContent;
+
+            chatContainer.appendChild(messageElement);
+            chatContainer.scrollTop = chatContainer.scrollHeight; // Scroller vers le bas
+        }
+
         // Gestion du formulaire principal (première question)
         document.getElementById('questionForm').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -186,19 +200,6 @@
             messages.push({ role: 'assistant', content: data.response });
             displayMessage('assistant', data.response);
         });
-
-        // Fonction pour afficher les messages dans le chat
-        function displayMessage(role, content) {
-            const chatContainer = document.getElementById('chatContainer');
-            const messageElement = document.createElement('div');
-            messageElement.classList.add('chat-bubble', role === 'user' ? 'user-bubble' : 'assistant-bubble');
-
-            // Appliquer la mise en forme des termes techniques
-            messageElement.innerHTML = formatTechnicalTerms(content.trim().replace(/\n/g, '<br>')); 
-
-            chatContainer.appendChild(messageElement);
-            chatContainer.scrollTop = chatContainer.scrollHeight; // Scroller vers le bas
-        }
 
         // Gestion du clic sur les mots techniques
         document.addEventListener('click', async (e) => {
