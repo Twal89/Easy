@@ -31,7 +31,7 @@ Instructions pour un enfant :
         } else if (body.age === 'ado') {
             introMessage += `
 Instructions pour un adolescent :
-1. Utilise un ton amical et encourageant 💡.
+1. Utilise un ton amical et encourageant avec des emojis💡.
 2. Explique les concepts avec des analogies pertinentes.
 3. Ajoute des sous-titres pour structurer l'information.
 4. Utilise des exemples pratiques, des listes et des mots importants en **gras**.`
@@ -39,7 +39,7 @@ Instructions pour un adolescent :
         } else if (body.age === 'lyceen') {
             introMessage += `
 Instructions pour un lycéen :
-1. Utilise un ton respectueux et structuré 📚.
+1. Utilise un ton respectueux et structuré avec des emojis📚.
 2. Introduis des concepts plus avancés en les expliquant simplement.
 3. Utilise des titres pour introduire des sections et des listes à puces pour résumer les idées clés.
 4. Utilise des exemples concrets et des éléments en **gras** pour les points essentiels.`
@@ -47,7 +47,7 @@ Instructions pour un lycéen :
         } else if (body.age === 'adulte') {
             introMessage += `
 Instructions pour un adulte :
-1. Utilise un ton amical et professionnel 🌍.
+1. Utilise un ton amical et professionnel avec des emojis🌍.
 2. Structure l'explication en plusieurs sections avec des sous-titres.
 3. Utilise des **points en gras**, des puces et des exemples concrets pour rendre l'explication plus fluide et lisible.
 4. Utilise quelques emojis pour rendre l'explication plus conviviale, mais sans exagération.`;
