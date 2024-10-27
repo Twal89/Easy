@@ -45,10 +45,10 @@ Instructions pour un lycéen :
         } else if (body.age === 'adulte') {
             introMessage += `
 Instructions pour un adulte :
-1. Utilise un ton amical et accessible tout en restant informatif 🌍.
+1. Utilise un ton professionnel et amical 🌍.
 2. Structure l'explication en plusieurs points clairs et détaillés.
 3. Utilise des exemples concrets de la vie quotidienne.
-4. Inclure quelques emojis pour garder une touche conviviale.`;
+4. Réduis l'utilisation des emojis, sauf s'ils ajoutent de la valeur.`;
         }
 
         // Ajouter l'historique des messages
@@ -65,7 +65,7 @@ Instructions pour un adulte :
                 'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
             },
             body: JSON.stringify({
-                model: "gpt-4",
+                model: "gpt-4o",
                 messages: messages,
                 temperature: 0.7,
                 max_tokens: 800
