@@ -45,10 +45,13 @@ export default async function handler(req) {
         });
 
         if (!openaiResponse.ok) {
-            throw new Error(`OpenAI API error: ${await response.text()}`);
+            throw new Error(`OpenAI API error: ${await openaiResponse.text()}`);
         }
 
         const data = await openaiResponse.json();
+
+        // Ajouter un console.log pour voir la réponse renvoyée par GPT
+        console.log(data.response); // Ceci affichera la réponse avec les termes entourés de balises [TERM]
 
         // Retourner la réponse de GPT avec les mots techniques
         return new Response(JSON.stringify({
