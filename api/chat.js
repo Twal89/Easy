@@ -17,22 +17,22 @@ export default async function handler(req) {
             throw new Error('API key not configured');
         }
 
-        // Pour la première question : inclure une introduction formelle
+        // Première interaction - introduction formelle
         let firstMessage = '';
         if (body.messages.length === 0) {
-            firstMessage = `Salut ${body.name}! 🌟 Je suis super content de t'aider aujourd'hui! Tu veux savoir quelque chose sur "${body.question}" ? Allons-y ! 👇`;
+            firstMessage = `Salut ${body.name}! 😊 Je suis super content de te répondre aujourd'hui! Tu m'as demandé quelque chose sur "${body.question}", c'est vraiment passionnant ! Je vais t'expliquer tout ça ! 🔥`;
         }
 
-        // Adapter le ton à l'âge de l'utilisateur
+        // Adapter le ton à l'âge
         let ageAdaptation = '';
         if (body.age === 'enfant') {
-            ageAdaptation = `Utilise des termes simples et des analogies amusantes pour expliquer ce qu'est ${body.question}. Si des mots compliqués comme "gravité" sont utilisés, assure-toi de les expliquer.`;
+            ageAdaptation = `Utilise des mots simples et pleins d'émotions. N'oublie pas d'utiliser des analogies amusantes (ex : "comme un ballon qui gonfle") pour bien expliquer les concepts.`;
         } else if (body.age === 'ado') {
-            ageAdaptation = `Adapte ton explication pour un adolescent. Utilise des exemples modernes et évite les mots trop compliqués, mais n'hésite pas à introduire des concepts un peu plus détaillés.`;
+            ageAdaptation = `Utilise un ton amical et engageant, en évitant les termes trop compliqués. Fais attention à expliquer les mots techniques avec des exemples concrets.`;
         } else if (body.age === 'lyceen') {
-            ageAdaptation = `Explique ${body.question} de manière détaillée avec des termes scientifiques, mais assure-toi de les expliquer simplement si nécessaire. Utilise des exemples pertinents.`;
+            ageAdaptation = `Sois clair et précis, mais reste amical. Utilise des exemples concrets pour expliquer les termes plus complexes.`;
         } else if (body.age === 'adulte') {
-            ageAdaptation = `Réponds de manière précise et détaillée, sans infantiliser l'utilisateur. Utilise des explications claires avec des exemples concrets et des termes techniques si nécessaire.`;
+            ageAdaptation = `Reste professionnel mais amical. Assure-toi d'expliquer les termes techniques et de rendre l'explication claire et facile à suivre.`;
         }
 
         const messages = [
@@ -61,7 +61,7 @@ export default async function handler(req) {
 
         const data = await openaiResponse.json();
 
-        // Retourner la réponse de GPT avec l'adaptation selon l'âge
+        // Retourner la réponse de GPT avec l'adaptation selon l'âge et un ton amical
         return new Response(JSON.stringify({
             response: data.choices[0].message.content,
             messages: [...body.messages, { role: 'assistant', content: data.choices[0].message.content }]
