@@ -335,18 +335,30 @@
             const quizContainer = document.getElementById('quiz-container');
             const quizOptions = document.getElementById('quiz-options');
             
-            quizOptions.innerHTML = options.map((option, index) => `
-                <div class="quiz-option">
-                    <label class="flex items-center p-4 cursor-pointer">
-                        <input type="radio" name="quiz-answer" value="${option}" 
-                            class="mr-3"
-                            onclick="handleOptionSelect(this)">
-                        <span>${String.fromCharCode(65 + index)}) ${option}</span>
-                    </label>
+            // Nouveau format pour les options QCM
+            quizOptions.innerHTML = `
+                <div class="space-y-3">
+                    ${options.map((option, index) => `
+                        <div class="quiz-option bg-white p-4 rounded-lg">
+                            <label class="flex items-center w-full cursor-pointer">
+                                <input type="radio" 
+                                    name="quiz-answer" 
+                                    value="${option}"
+                                    class="form-radio h-5 w-5 text-indigo-600" 
+                                    onclick="handleOptionSelect(this)">
+                                <span class="ml-3 block text-gray-800">
+                                    ${String.fromCharCode(65 + index)}) ${option}
+                                </span>
+                            </label>
+                        </div>
+                    `).join('')}
                 </div>
-            `).join('');
-
+            `;
+        
+            // Afficher le conteneur QCM
             quizContainer.classList.remove('hidden');
+            // Cacher le bouton de validation jusqu'à ce qu'une option soit sélectionnée
+            document.getElementById('submit-quiz').classList.add('hidden');
         }
 
         function handleOptionSelect(radio) {
