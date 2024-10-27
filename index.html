@@ -125,6 +125,13 @@
                     <!-- Les bulles de chat seront ajoutées ici -->
                 </div>
 
+                <!-- Bouton "Explique-moi autrement" -->
+                <div id="alternateExplanationContainer" class="hidden text-center mt-4">
+                    <button id="alternateExplanationBtn" class="w-full gradient-bg text-white font-bold py-3 px-4 rounded-md hover:opacity-90 transition duration-300">
+                        Explique-moi autrement stp :)
+                    </button>
+                </div>
+
                 <form id="chatForm" class="mt-4">
                     <input type="text" id="userMessage" class="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Tapez votre message...">
                     <button type="submit" class="w-full gradient-bg text-white font-bold py-3 px-4 rounded-md hover:opacity-90 transition duration-300 mt-2">Envoyer</button>
@@ -134,108 +141,108 @@
     </div>
 
     <script>
-        const messages = []; // Initialiser l'historique des messages
+    const messages = []; // Initialiser l'historique des messages
 
-        // Gestion du formulaire principal (première question)
-        document.getElementById('questionForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
+    // Gestion du formulaire principal (première question)
+    document.getElementById('questionForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
 
-            const name = document.getElementById('name').value;
-            const age = document.getElementById('age').value;
-            const question = document.getElementById('question').value;
+        const name = document.getElementById('name').value;
+        const age = document.getElementById('age').value;
+        const question = document.getElementById('question').value;
 
-            // Ajouter le premier message dans l'historique
-            messages.push({ role: 'user', content: question });
+        // Ajouter le premier message dans l'historique
+        messages.push({ role: 'user', content: question });
 
-            // Afficher la question de l'utilisateur dans l'interface
-            displayMessage('user', question);
+        // Afficher la question de l'utilisateur dans l'interface
+        displayMessage('user', question);
 
-            // Afficher l'indicateur de chargement
-            document.getElementById('loadingIndicator').classList.remove('hidden');
+        // Afficher l'indicateur de chargement
+        document.getElementById('loadingIndicator').classList.remove('hidden');
 
-            // Appeler l'API pour obtenir une réponse
-            const response = await fetch('/api/chat', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    name: name,
-                    age: age,
-                    question: question,
-                    messages: messages
-                })
-            });
-
-            const data = await response.json();
-
-            // Masquer l'indicateur de chargement
-            document.getElementById('loadingIndicator').classList.add('hidden');
-
-            // Ajouter la réponse de GPT à l'historique et à l'interface
-            messages.push({ role: 'assistant', content: data.response });
-            displayMessage('assistant', data.response);
-
-            // Rendre visible la zone de chat pour la suite
-            document.getElementById('response').classList.remove('hidden');
+        // Appeler l'API pour obtenir une réponse
+        const response = await fetch('/api/chat', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                name: name,
+                age: age,
+                question: question,
+                messages: messages
+            })
         });
 
-        // Gestion du chat pour continuer la conversation
-        document.getElementById('chatForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
+        const data = await response.json();
 
-            const userMessage = document.getElementById('userMessage').value;
-            document.getElementById('userMessage').value = '';
+        // Masquer l'indicateur de chargement
+        document.getElementById('loadingIndicator').classList.add('hidden');
 
-            // Ajouter le message de l'utilisateur à l'historique
-            messages.push({ role: 'user', content: userMessage });
+        // Ajouter la réponse de GPT à l'historique et à l'interface
+        messages.push({ role: 'assistant', content: data.response });
+        displayMessage('assistant', data.response);
 
-            // Afficher le message de l'utilisateur dans l'interface
-            displayMessage('user', userMessage);
+        // Rendre visible la zone de chat pour la suite
+        document.getElementById('response').classList.remove('hidden');
+        document.getElementById('alternateExplanationContainer').classList.remove('hidden'); // Afficher le bouton "Explique-moi autrement"
+    });
 
-            // Afficher l'indicateur de chargement
-            document.getElementById('loadingIndicator').classList.remove('hidden');
+    // Gestion du bouton "Explique-moi autrement"
+    document.getElementById('alternateExplanationBtn').addEventListener('click', async (e) => {
+        e.preventDefault();
 
-            // Appeler l'API pour obtenir une réponse
-            const response = await fetch('/api/chat', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    name: 'Utilisateur',
-                    age: document.getElementById('age').value,
-                    question: userMessage,
-                    messages: messages
-                })
-            });
+        const lastMessage = messages[messages.length - 1]; // Récupérer le dernier message utilisateur
 
-            const data = await response.json();
+        // Ajouter une requête d'explication alternative dans l'historique
+        messages.push({ role: 'user', content: "Explique-moi autrement stp :)" });
 
-            // Masquer l'indicateur de chargement
-            document.getElementById('loadingIndicator').classList.add('hidden');
+        // Afficher le message dans l'interface
+        displayMessage('user', "Explique-moi autrement stp :)");
 
-            // Ajouter la réponse de GPT à l'historique et à l'interface
-            messages.push({ role: 'assistant', content: data.response });
-            displayMessage('assistant', data.response);
+        // Afficher l'indicateur de chargement
+        document.getElementById('loadingIndicator').classList.remove('hidden');
+
+        // Appeler l'API pour obtenir une explication alternative
+        const response = await fetch('/api/chat', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                name: 'Utilisateur',
+                age: document.getElementById('age').value,
+                question: lastMessage.content, // Réutiliser la dernière question utilisateur
+                messages: messages
+            })
         });
 
-        // Fonction pour afficher les messages dans le chat
-        function displayMessage(role, content) {
-            const chatContainer = document.getElementById('chatContainer');
-            const messageElement = document.createElement('div');
-            messageElement.classList.add('chat-bubble', role === 'user' ? 'user-bubble' : 'assistant-bubble');
+        const data = await response.json();
 
-            // Convertir le contenu en HTML et formater
-            let formattedContent = content
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Remplacer **texte** par <strong>texte</strong>
-                .replace(/__(.*?)__/g, '<em>$1</em>') // Remplacer __texte__ par <em>texte</em>
-                .replace(/\n/g, '<br>'); // Remplacer les sauts de ligne par des balises <br>
+        // Masquer l'indicateur de chargement
+        document.getElementById('loadingIndicator').classList.add('hidden');
 
-            messageElement.innerHTML = formattedContent;
-            chatContainer.appendChild(messageElement);
-            chatContainer.scrollTop = chatContainer.scrollHeight; // Scroller vers le bas
-        }
-    </script>
+        // Ajouter l'explication alternative à l'historique et à l'interface
+        messages.push({ role: 'assistant', content: data.response });
+        displayMessage('assistant', data.response);
+    });
+
+    // Fonction pour afficher les messages dans le chat
+    function displayMessage(role, content) {
+        const chatContainer = document.getElementById('chatContainer');
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('chat-bubble', role === 'user' ? 'user-bubble' : 'assistant-bubble');
+
+        // Convertir les balises Markdown en HTML
+        let formattedContent = content
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Remplacer **texte** par <strong>texte</strong>
+            .replace(/__(.*?)__/g, '<em>$1</em>') // Remplacer __texte__ par <em>texte</em>
+            .replace(/\n/g, '<br>'); // Remplacer les sauts de ligne par des balises <br>
+
+        messageElement.innerHTML = formattedContent;
+        chatContainer.appendChild(messageElement);
+        chatContainer.scrollTop = chatContainer.scrollHeight; // Scroller vers le bas
+    }
+</script>
 </body>
 </html>
