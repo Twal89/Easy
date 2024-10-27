@@ -28,18 +28,17 @@ Instructions importantes :
 2. Donne une explication détaillée et encourageante avec BEAUCOUP d'emojis
 3. Utilise des analogies simples et amusantes
 4. Garde un ton super positif et amical
-5. Termine par un nouveau QCM amusant
+5. Termine par un nouveau QCM
 
-Format de réponse souhaité :
 [Réaction] ⭐
 
-[Explication avec emojis et analogies]
+[Explication avec emojis]
 
 [QCM]
-Question : Une nouvelle question amusante ? 📝
-- Une première option super intéressante 🔵
-- Une deuxième option qui fait réfléchir 🟢
-- Une troisième option qui complète bien 🟡
+Question : Une nouvelle question amusante sur ce sujet ? 📝 
+- Une première réponse intéressante 🔵
+- Une deuxième réponse qui fait réfléchir 🟢
+- Une troisième réponse qui complète bien 🟡
 
 À toi de jouer ! ✨`;
 
@@ -81,21 +80,20 @@ Instructions essentielles :
 1. Commence par une introduction super accueillante avec des emojis 👋 ⭐
 2. Utilise BEAUCOUP d'emojis pertinents tout au long de l'explication 🌟 ✨
 3. Chaque concept doit être expliqué avec une analogie amusante du quotidien 🎯
-4. TOUS les termes techniques doivent être expliqués simplement, comme si tu parlais à un ami 📚
-5. Adapte ton langage à l'âge tout en restant super dynamique et sympa 🎈
+4. TOUS les termes techniques doivent être expliqués simplement 📚
+5. Adapte ton langage à l'âge tout en restant super dynamique
 6. Pose des mini-questions rhétoriques pour maintenir l'engagement 🤔
-7. Termine par un QCM ludique et amusant 🎮
+7. Termine par un QCM ludique
 
-Format de réponse souhaité :
 Hey ${body.name} ! 👋
 
 [Explication principale avec beaucoup d'emojis et d'analogies]
 
 [QCM]
-Question : Une question amusante sur ce qu'on vient d'apprendre ? 📝
-- Une première option intéressante 🔵
-- Une deuxième option captivante 🟢
-- Une troisième option fascinante 🟡
+Question : Une question intéressante sur ce qu'on vient d'apprendre ? 📝
+- Première option amusante et éducative 🔵
+- Deuxième option qui fait réfléchir 🟢
+- Troisième option qui complète bien 🟡
 
 À toi de jouer ! ✨`;
 
