@@ -106,30 +106,26 @@
     </div>
 
     <script>
-        const messages = []; // Initialiser l'historique des messages
+        const messages = [];
 
-        // Fonction pour détecter et rendre les termes techniques interactifs
         function formatTechnicalTerms(content) {
             return content.replace(/\[TERM\](.*?)\[\/TERM\]/g, (match, term) => {
                 return `<a href="#" class="tech-term" data-term="${term}">${term}</a>`;
             });
         }
 
-        // Fonction pour afficher les messages dans le chat
         function displayMessage(role, content) {
             const chatContainer = document.getElementById('chatContainer');
             const messageElement = document.createElement('div');
             messageElement.classList.add('chat-bubble', role === 'user' ? 'user-bubble' : 'assistant-bubble');
 
-            // Appliquer la mise en forme des termes techniques avant d'afficher
-            const formattedContent = formatTechnicalTerms(content.trim().replace(/\n/g, '<br>')); 
+            const formattedContent = formatTechnicalTerms(content.trim().replace(/\n/g, '<br>'));
             messageElement.innerHTML = formattedContent;
 
             chatContainer.appendChild(messageElement);
-            chatContainer.scrollTop = chatContainer.scrollHeight; // Scroller vers le bas
+            chatContainer.scrollTop = chatContainer.scrollHeight;
         }
 
-        // Gestion du formulaire principal (première question)
         document.getElementById('questionForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
@@ -137,13 +133,10 @@
             const age = document.getElementById('age').value;
             const question = document.getElementById('question').value;
 
-            // Ajouter le premier message dans l'historique
             messages.push({ role: 'user', content: question });
 
-            // Afficher la question de l'utilisateur dans l'interface
             displayMessage('user', question);
 
-            // Appeler l'API pour obtenir une réponse
             const response = await fetch('/api/chat', {
                 method: 'POST',
                 headers: {
@@ -159,28 +152,22 @@
 
             const data = await response.json();
 
-            // Ajouter la réponse de GPT à l'historique et à l'interface
             messages.push({ role: 'assistant', content: data.response });
             displayMessage('assistant', data.response);
 
-            // Rendre visible la zone de chat pour la suite
             document.getElementById('response').classList.remove('hidden');
         });
 
-        // Gestion du chat pour continuer la conversation
         document.getElementById('chatForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
             const userMessage = document.getElementById('userMessage').value;
             document.getElementById('userMessage').value = '';
 
-            // Ajouter le message de l'utilisateur à l'historique
             messages.push({ role: 'user', content: userMessage });
 
-            // Afficher le message de l'utilisateur dans l'interface
             displayMessage('user', userMessage);
 
-            // Appeler l'API pour obtenir une réponse
             const response = await fetch('/api/chat', {
                 method: 'POST',
                 headers: {
@@ -196,21 +183,17 @@
 
             const data = await response.json();
 
-            // Ajouter la réponse de GPT à l'historique et à l'interface
             messages.push({ role: 'assistant', content: data.response });
             displayMessage('assistant', data.response);
         });
 
-        // Gestion du clic sur les mots techniques
         document.addEventListener('click', async (e) => {
             if (e.target.classList.contains('tech-term')) {
                 e.preventDefault();
                 const term = e.target.getAttribute('data-term');
 
-                // Ajouter le terme technique cliqué dans le chat
                 displayMessage('user', `Peux-tu m'expliquer ce qu'est "${term}" ?`);
 
-                // Appeler l'API pour obtenir une explication du terme
                 const response = await fetch('/api/chat', {
                     method: 'POST',
                     headers: {
@@ -226,7 +209,6 @@
 
                 const data = await response.json();
 
-                // Ajouter la réponse de GPT à l'historique et à l'interface
                 messages.push({ role: 'assistant', content: data.response });
                 displayMessage('assistant', data.response);
             }
