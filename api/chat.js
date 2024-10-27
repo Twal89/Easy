@@ -70,7 +70,7 @@ Instructions pour un adulte :
                 model: "gpt-4",
                 messages: messages,
                 temperature: 0.7,
-                max_tokens: 800
+                max_tokens: 2000
             })
         });
 
