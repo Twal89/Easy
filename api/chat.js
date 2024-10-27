@@ -17,38 +17,38 @@ export default async function handler(req) {
             throw new Error('API key not configured');
         }
 
-        // Adapter le ton en fonction de l'âge de l'utilisateur
-        let introMessage = `Tu t'adresses à ${body.name}, âgé de ${body.age}, qui pose la question suivante : ${body.question}. Réponds de manière très détaillée, engageante et structurée en paragraphes.`;
+        // Adapter le ton en fonction de l'âge de l'utilisateur tout en restant friendly pour tous les âges
+        let introMessage = `Tu t'adresses à ${body.name}, âgé(e) de ${body.age}, qui pose la question suivante : "${body.question}". Réponds de manière détaillée, engageante et structurée en paragraphes, avec des explications riches et précises.`;
 
-        // Adapter le ton à l'âge sélectionné
+        // Adapter le ton en fonction de l'âge, mais garder un style friendly et engageant avec des emojis pour tous les âges
         if (body.age === 'enfant') {
             introMessage += `
 Instructions pour un enfant (6-11 ans) :
-1. Utilise un ton **très enthousiaste** avec beaucoup d'**emojis**. 🎉🤩
-2. Fais des analogies amusantes et simples. Par exemple, compare le Soleil à une "énorme boule de feu".
-3. Explique chaque concept clairement avec des phrases courtes et simples.
-4. Utilise des comparaisons amusantes (jouets, animaux, jeux) et pose des mini-questions ("Tu veux en savoir plus ? 😊").`;
+1. Utilise un ton **très enthousiaste** avec **beaucoup d'emojis**. 🎉🤩
+2. Fais des analogies simples et amusantes, comme comparer le Soleil à une "énorme boule de feu". ☀️🔥
+3. Explique chaque concept avec des phrases courtes et claires.
+4. Encourage la curiosité en posant des questions comme "Tu veux en savoir plus ? 😊".`;
 
         } else if (body.age === 'ado') {
             introMessage += `
 Instructions pour un adolescent (12-15 ans) :
-1. Utilise un ton **amical et engageant**, avec des **emojis** modérés. 💡⚡
-2. Donne des analogies pertinentes pour leur âge (ex : réseaux sociaux, technologie).
-3. Explique les concepts simplement mais introduis quelques termes techniques en les expliquant brièvement.`;
+1. Utilise un ton **amical et engageant**, avec des **emojis modérés**. 💡⚡
+2. Donne des analogies pertinentes pour leur âge, comme des comparaisons avec la technologie ou les réseaux sociaux.
+3. Introduis des termes techniques simples mais expliques-les brièvement pour qu'ils comprennent bien.`;
 
         } else if (body.age === 'lyceen') {
             introMessage += `
 Instructions pour un lycéen (16-18 ans) :
-1. Utilise un ton **respectueux et structuré**. 📘
-2. Explique les concepts de manière plus approfondie et claire.
-3. Utilise des exemples un peu plus sophistiqués ou des analogies complexes.`;
+1. Utilise un ton **respectueux mais engageant**. 📘
+2. Donne des explications plus détaillées, avec des exemples un peu plus complexes, mais garde des analogies accessibles.
+3. N'hésite pas à poser des questions pour stimuler la curiosité.`;
 
         } else if (body.age === 'adulte') {
             introMessage += `
 Instructions pour un adulte (18+ ans) :
-1. Utilise un ton **professionnel mais amical**. 🌍
-2. Structure l'explication en **plusieurs points** bien détaillés.
-3. Utilise des exemples concrets de la vie quotidienne et limite les emojis, sauf s'ils ajoutent une valeur claire.`;
+1. Utilise un ton **amical et professionnel**, mais toujours engageant. 🌍
+2. Structure bien les explications en paragraphes détaillés.
+3. Utilise des emojis pour illustrer ou rendre l'explication plus visuelle (ex: 🌞 pour le Soleil, ⚛️ pour la science).`;
         }
 
         // Ajouter l'historique des messages
