@@ -50,6 +50,8 @@
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
+            font-weight: bold;
+            font-size: 1.1rem;
         }
         .loading-indicator::after {
             content: '...';
@@ -112,6 +114,11 @@
                 </button>
             </form>
 
+            <!-- Indicateur de chargement -->
+            <div id="loadingIndicator" class="hidden text-center mt-4">
+                <div class="loading-indicator">Je réfléchis 🤔 Patiente un instant...</div>
+            </div>
+
             <!-- Zone de chat -->
             <div id="response" class="mt-8 hidden">
                 <div id="chatContainer" class="chat-container">
@@ -143,6 +150,9 @@
             // Afficher la question de l'utilisateur dans l'interface
             displayMessage('user', question);
 
+            // Afficher l'indicateur de chargement
+            document.getElementById('loadingIndicator').classList.remove('hidden');
+
             // Appeler l'API pour obtenir une réponse
             const response = await fetch('/api/chat', {
                 method: 'POST',
@@ -158,6 +168,9 @@
             });
 
             const data = await response.json();
+
+            // Masquer l'indicateur de chargement
+            document.getElementById('loadingIndicator').classList.add('hidden');
 
             // Ajouter la réponse de GPT à l'historique et à l'interface
             messages.push({ role: 'assistant', content: data.response });
@@ -180,6 +193,9 @@
             // Afficher le message de l'utilisateur dans l'interface
             displayMessage('user', userMessage);
 
+            // Afficher l'indicateur de chargement
+            document.getElementById('loadingIndicator').classList.remove('hidden');
+
             // Appeler l'API pour obtenir une réponse
             const response = await fetch('/api/chat', {
                 method: 'POST',
@@ -196,6 +212,9 @@
 
             const data = await response.json();
 
+            // Masquer l'indicateur de chargement
+            document.getElementById('loadingIndicator').classList.add('hidden');
+
             // Ajouter la réponse de GPT à l'historique et à l'interface
             messages.push({ role: 'assistant', content: data.response });
             displayMessage('assistant', data.response);
@@ -206,15 +225,14 @@
             const chatContainer = document.getElementById('chatContainer');
             const messageElement = document.createElement('div');
             messageElement.classList.add('chat-bubble', role === 'user' ? 'user-bubble' : 'assistant-bubble');
-        
-            // Convertir les balises Markdown en HTML
+
+            // Convertir le contenu en HTML et formater
             let formattedContent = content
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Remplacer **text** par <strong>text</strong>
-                .replace(/__(.*?)__/g, '<em>$1</em>') // Remplacer __text__ par <em>text</em>
-                .replace(/\n/g, '<br>'); // Sauts de ligne
-        
-            // Ajouter le contenu formaté au message
-            messageElement.innerHTML = formattedContent; 
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Remplacer **texte** par <strong>texte</strong>
+                .replace(/__(.*?)__/g, '<em>$1</em>') // Remplacer __texte__ par <em>texte</em>
+                .replace(/\n/g, '<br>'); // Remplacer les sauts de ligne par des balises <br>
+
+            messageElement.innerHTML = formattedContent;
             chatContainer.appendChild(messageElement);
             chatContainer.scrollTop = chatContainer.scrollHeight; // Scroller vers le bas
         }
