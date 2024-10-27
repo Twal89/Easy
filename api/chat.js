@@ -65,7 +65,7 @@ Instructions pour un adulte (18+ ans) :
                 'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
             },
             body: JSON.stringify({
-                model: "gpt-3.5-turbo",
+                model: "chatgpt-4o-latest",
                 messages: messages,
                 temperature: 0.7,
                 max_tokens: 800
