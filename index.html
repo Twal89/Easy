@@ -206,10 +206,15 @@
             const chatContainer = document.getElementById('chatContainer');
             const messageElement = document.createElement('div');
             messageElement.classList.add('chat-bubble', role === 'user' ? 'user-bubble' : 'assistant-bubble');
-
-            // Structurer le contenu avec des paragraphes et sauts de ligne
-            messageElement.innerHTML = content.trim().replace(/\n/g, '<br>'); 
-
+        
+            // Convertir les balises Markdown en HTML
+            let formattedContent = content
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Remplacer **text** par <strong>text</strong>
+                .replace(/__(.*?)__/g, '<em>$1</em>') // Remplacer __text__ par <em>text</em>
+                .replace(/\n/g, '<br>'); // Sauts de ligne
+        
+            // Ajouter le contenu formaté au message
+            messageElement.innerHTML = formattedContent; 
             chatContainer.appendChild(messageElement);
             chatContainer.scrollTop = chatContainer.scrollHeight; // Scroller vers le bas
         }
