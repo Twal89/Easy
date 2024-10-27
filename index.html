@@ -207,11 +207,24 @@
             const messageElement = document.createElement('div');
             messageElement.classList.add('chat-bubble', role === 'user' ? 'user-bubble' : 'assistant-bubble');
 
-            // Structurer le contenu avec des paragraphes et sauts de ligne
-            messageElement.innerHTML = content.trim().replace(/\n/g, '<br>'); 
+            // Utilisation de la fonction markdownToHTML pour formater le texte
+            messageElement.innerHTML = markdownToHTML(content.trim().replace(/\n/g, '<br>'));
 
             chatContainer.appendChild(messageElement);
+           Voici la suite du code :
+
+```html
             chatContainer.scrollTop = chatContainer.scrollHeight; // Scroller vers le bas
+        }
+
+        // Fonction pour convertir Markdown en HTML
+        function markdownToHTML(markdown) {
+            // Remplacer les **texte** par <strong>texte</strong> pour le gras
+            let html = markdown.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            // Remplacer les __texte__ par <em>texte</em> pour l'italique
+            html = html.replace(/__(.*?)__/g, '<em>$1</em>');
+            // Ajouter d'autres conversions de Markdown si nécessaire (titres, listes, etc.)
+            return html;
         }
     </script>
 </body>
