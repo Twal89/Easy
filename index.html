@@ -139,8 +139,7 @@
             </div>
         </main>
     </div>
-
-    <script>
+<script>
     const messages = []; // Initialiser l'historique des messages
 
     // Gestion du formulaire principal (première question)
@@ -188,6 +187,48 @@
         document.getElementById('alternateExplanationContainer').classList.remove('hidden'); // Afficher le bouton "Explique-moi autrement"
     });
 
+    // Gestion du chat pour les questions suivantes
+    document.getElementById('chatForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const userMessage = document.getElementById('userMessage').value;
+        document.getElementById('userMessage').value = '';
+
+        // Ajouter le message de l'utilisateur à l'historique
+        messages.push({ role: 'user', content: userMessage });
+
+        // Afficher le message de l'utilisateur dans l'interface
+        displayMessage('user', userMessage);
+
+        // Afficher l'indicateur de chargement avec un message personnalisé
+        const waitingMessage = 'Je te dis ça de suite ! :)';
+        displayMessage('assistant', waitingMessage); // Afficher temporairement ce message
+
+        // Appeler l'API pour obtenir une réponse
+        const response = await fetch('/api/chat', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                name: 'Utilisateur',
+                age: document.getElementById('age').value,
+                question: userMessage,
+                messages: messages
+            })
+        });
+
+        const data = await response.json();
+
+        // Supprimer le message d'attente avant d'afficher la vraie réponse
+        const chatContainer = document.getElementById('chatContainer');
+        chatContainer.removeChild(chatContainer.lastChild); // Supprimer le dernier message affiché (le message d'attente)
+
+        // Ajouter la vraie réponse à l'historique et à l'interface
+        messages.push({ role: 'assistant', content: data.response });
+        displayMessage('assistant', data.response);
+    });
+
     // Gestion du bouton "Explique-moi autrement"
     document.getElementById('alternateExplanationBtn').addEventListener('click', async (e) => {
         e.preventDefault();
@@ -200,8 +241,9 @@
         // Afficher le message dans l'interface
         displayMessage('user', "Explique-moi autrement stp :)");
 
-        // Afficher l'indicateur de chargement
-        document.getElementById('loadingIndicator').classList.remove('hidden');
+        // Afficher l'indicateur de chargement avec un message personnalisé
+        const waitingMessage = 'Je réfléchis à une autre façon... 😉';
+        displayMessage('assistant', waitingMessage); // Afficher temporairement ce message
 
         // Appeler l'API pour obtenir une explication alternative
         const response = await fetch('/api/chat', {
@@ -219,8 +261,9 @@
 
         const data = await response.json();
 
-        // Masquer l'indicateur de chargement
-        document.getElementById('loadingIndicator').classList.add('hidden');
+        // Supprimer le message d'attente avant d'afficher la vraie réponse
+        const chatContainer = document.getElementById('chatContainer');
+        chatContainer.removeChild(chatContainer.lastChild); // Supprimer le dernier message affiché (le message d'attente)
 
         // Ajouter l'explication alternative à l'historique et à l'interface
         messages.push({ role: 'assistant', content: data.response });
@@ -244,5 +287,6 @@
         chatContainer.scrollTop = chatContainer.scrollHeight; // Scroller vers le bas
     }
 </script>
+    
 </body>
 </html>
