@@ -17,22 +17,22 @@ export default async function handler(req) {
             throw new Error('API key not configured');
         }
 
-        // Première interaction - introduction formelle
+        // Vérifier si c'est le premier message pour ajouter une salutation formelle
         let firstMessage = '';
         if (body.messages.length === 0) {
-            firstMessage = `Salut ${body.name}! 😊 Je suis super content de te répondre aujourd'hui! Tu m'as demandé quelque chose sur "${body.question}", c'est vraiment passionnant ! Je vais t'expliquer tout ça ! 🔥`;
+            firstMessage = `Salut ${body.name} ! 😊 Je suis super content de pouvoir t'aider aujourd'hui ! Tu veux comprendre quelque chose sur "${body.question}" ? Super, on va voir ça ensemble ! 🔥`;
         }
 
-        // Adapter le ton à l'âge
+        // Adapter le ton et la formulation à l'âge
         let ageAdaptation = '';
         if (body.age === 'enfant') {
-            ageAdaptation = `Utilise des mots simples et pleins d'émotions. N'oublie pas d'utiliser des analogies amusantes (ex : "comme un ballon qui gonfle") pour bien expliquer les concepts.`;
+            ageAdaptation = `Utilise des phrases courtes et simples. Prends des exemples du quotidien (comme des jouets, des animaux, etc.) pour expliquer les choses compliquées.`;
         } else if (body.age === 'ado') {
-            ageAdaptation = `Utilise un ton amical et engageant, en évitant les termes trop compliqués. Fais attention à expliquer les mots techniques avec des exemples concrets.`;
+            ageAdaptation = `Sois amical et engageant, mais ajoute des détails techniques en les expliquant simplement. Utilise des exemples pertinents pour leur âge (sports, réseaux sociaux, etc.).`;
         } else if (body.age === 'lyceen') {
-            ageAdaptation = `Sois clair et précis, mais reste amical. Utilise des exemples concrets pour expliquer les termes plus complexes.`;
+            ageAdaptation = `Utilise un ton respectueux et un peu plus formel. Explique des concepts plus avancés, mais reste simple et clair.`;
         } else if (body.age === 'adulte') {
-            ageAdaptation = `Reste professionnel mais amical. Assure-toi d'expliquer les termes techniques et de rendre l'explication claire et facile à suivre.`;
+            ageAdaptation = `Sois professionnel mais toujours amical. Ajoute des exemples concrets et des explications plus détaillées.`;
         }
 
         const messages = [
@@ -51,17 +51,17 @@ export default async function handler(req) {
                 model: "gpt-3.5-turbo",
                 messages: messages,
                 temperature: 0.7,
-                max_tokens: 800
+                max_tokens: 1000
             })
         });
 
         if (!openaiResponse.ok) {
-            throw new Error(`OpenAI API error: ${await openaiResponse.text()}`);
+            throw new Error(`OpenAI API error: ${await response.text()}`);
         }
 
         const data = await openaiResponse.json();
 
-        // Retourner la réponse de GPT avec l'adaptation selon l'âge et un ton amical
+        // Retourner la réponse de GPT
         return new Response(JSON.stringify({
             response: data.choices[0].message.content,
             messages: [...body.messages, { role: 'assistant', content: data.choices[0].message.content }]
