@@ -15,11 +15,6 @@
         .custom-shadow {
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
-        .explanation-text {
-            line-height: 1.8;
-            white-space: pre-line;
-            padding: 1rem;
-        }
         #chat-container {
             font-size: 1.1rem;
             text-align: justify;
@@ -103,36 +98,6 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
 
-        .image-preview {
-            max-width: 100%;
-            border-radius: 0.5rem;
-            margin-top: 1rem;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .loading-indicator {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .loading-indicator::after {
-            content: '...';
-            animation: dots 1.5s steps(4, end) infinite;
-            width: 1.5em;
-        }
-
-        @keyframes dots {
-            0%, 20% { content: '.'; }
-            40% { content: '..'; }
-            60% { content: '...'; }
-            80%, 100% { content: ''; }
-        }
-
         .emoji-bounce {
             display: inline-block;
             animation: bounce 0.6s ease infinite;
@@ -143,69 +108,6 @@
             50% { transform: translateY(-3px); }
         }
 
-        .quiz-container {
-        margin-top: 2rem;
-        background-color: white;
-        border-radius: 1rem;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        
-        .quiz-option {
-            margin-bottom: 1rem;
-        }
-        
-        .quiz-option label {
-            display: flex;
-            align-items: center;
-            padding: 1rem;
-            border: 2px solid #e5e7eb;
-            border-radius: 0.75rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .quiz-option label:hover {
-            border-color: #818cf8;
-            background-color: #f5f7ff;
-        }
-        
-        .quiz-option input[type="radio"] {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 20px;
-            height: 20px;
-            border: 2px solid #6366f1;
-            border-radius: 50%;
-            margin-right: 1rem;
-            position: relative;
-            cursor: pointer;
-            z-index: 1;
-        }
-        
-        .quiz-option input[type="radio"]::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 12px;
-            height: 12px;
-            background-color: #6366f1;
-            border-radius: 50%;
-            transform: translate(-50%, -50%) scale(0);
-            transition: transform 0.2s ease;
-        }
-        
-        .quiz-option input[type="radio"]:checked::before {
-            transform: translate(-50%, -50%) scale(1);
-        }
-        
-        .quiz-option.selected label {
-            border-color: #6366f1;
-            background-color: #f0f7ff;
-        }
-        
         #submit-quiz {
             opacity: 0;
             transform: translateY(10px);
@@ -217,8 +119,6 @@
             transform: translateY(0);
         }
 
-
-        
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen">
@@ -254,27 +154,6 @@
                     <textarea id="question" name="question" rows="4" required
                         class="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                         placeholder="Pose ta question ici..."></textarea>
-                </div>
-
-                <!-- Upload d'image -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Image (optionnel)</label>
-                    <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
-                        <div class="space-y-1 text-center">
-                            <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                                <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                            </svg>
-                            <div class="flex text-sm text-gray-600">
-                                <label for="file-upload" class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
-                                    <span>Télécharge une image</span>
-                                    <input id="file-upload" name="file-upload" type="file" accept="image/*" class="sr-only">
-                                </label>
-                            </div>
-                            <div id="image-preview-container" class="mt-2 hidden">
-                                <img id="image-preview" class="image-preview">
-                            </div>
-                        </div>
-                    </div>
                 </div>
 
                 <button type="submit"
@@ -313,21 +192,6 @@
         let userName = '';
         let userAge = '';
         let selectedQuizOption = null;
-        let imageData = null;
-
-        // Gestion de l'upload d'image
-        document.getElementById('file-upload').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    imageData = e.target.result;
-                    document.getElementById('image-preview').src = imageData;
-                    document.getElementById('image-preview-container').classList.remove('hidden');
-                };
-                reader.readAsDataURL(file);
-            }
-        });
 
         // Gestion du formulaire principal
         document.getElementById('questionForm').addEventListener('submit', async (e) => {
@@ -347,14 +211,6 @@
                 </div>
             `;
 
-            if (imageData) {
-                chatContainer.innerHTML += `
-                    <div class="user-bubble mt-2">
-                        <img src="${imageData}" alt="Image fournie" class="image-preview">
-                    </div>
-                `;
-            }
-
             // Afficher le chargement
             chatContainer.innerHTML += `
                 <div class="response-bubble" id="loading-message">
@@ -373,8 +229,7 @@
                     body: JSON.stringify({
                         name: userName,
                         age: userAge,
-                        question,
-                        hasImage: !!imageData
+                        question
                     })
                 });
             
