@@ -45,12 +45,12 @@ Instructions pour un lycéen :
         } else if (body.age === 'adulte') {
             introMessage += `
 Instructions pour un adulte :
-1. Utilise un ton professionnel et amical 🌍.
+1. Utilise un ton amical et accessible tout en restant informatif 🌍.
 2. Structure l'explication en plusieurs points clairs et détaillés.
 3. Utilise des exemples concrets de la vie quotidienne.
-4. Réduis l'utilisation des emojis, sauf s'ils ajoutent de la valeur.`;
+4. Inclure quelques emojis pour garder une touche conviviale.`;
         }
-
+        
         // Ajouter l'historique des messages
         const messages = [
             { role: 'system', content: introMessage }, // Message initial avec le ton
