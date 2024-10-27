@@ -19,7 +19,8 @@ export default async function handler(req) {
 
         // Si c'est une réponse à un QCM
         if (body.question.startsWith('Response:')) {
-            const prompt = `En tant que tuteur pédagogique super enthousiaste répondant à ${body.name}, évalue sa réponse : ${body.question}
+            const prompt = `
+            En tant que tuteur pédagogique super enthousiaste répondant à ${body.name}, évalue sa réponse : ${body.question}
 
 Instructions importantes :
 1. Commence DIRECTEMENT par une réaction spontanée et encourageante :
@@ -74,7 +75,8 @@ Question : Une nouvelle question amusante sur ce sujet ? 📝
         }
 
         // Pour une nouvelle question
-        const initialPrompt = `En tant que tuteur pédagogique super enthousiaste s'adressant à ${body.name} (${body.age}), explique de façon amusante et engageante : ${body.question}
+        const initialPrompt = `
+        En tant que tuteur pédagogique super enthousiaste s'adressant à ${body.name} (${body.age}), explique de façon amusante et engageante : ${body.question}
 
 Instructions essentielles :
 1. Commence par une introduction super accueillante avec des emojis 👋 ⭐
@@ -120,7 +122,18 @@ Question : Une question intéressante sur ce qu'on vient d'apprendre ? 📝
 
         const data = await openaiResponse.json();
         
-        return new Response(JSON.stringify(data), {
+        // Ajout d'une séparation claire entre le QCM et l'explication principale
+        // Pour s'assurer que le QCM est bien identifiable dans le front-end
+        const qcmPart = data.choices[0].message.content.split('[QCM]');
+        const explanation = qcmPart[0];
+        const qcm = qcmPart[1];
+
+        const formattedResponse = {
+            explanation: explanation.trim(),
+            qcm: qcm ? qcm.trim() : null
+        };
+
+        return new Response(JSON.stringify(formattedResponse), {
             status: 200,
             headers: {
                 'Content-Type': 'application/json',
