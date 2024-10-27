@@ -17,38 +17,43 @@ export default async function handler(req) {
             throw new Error('API key not configured');
         }
 
-        // Adapter le ton en fonction de l'âge de l'utilisateur tout en restant friendly pour tous les âges
-        let introMessage = `Tu t'adresses à ${body.name}, âgé(e) de ${body.age}, qui pose la question suivante : "${body.question}". Réponds de manière détaillée, engageante et structurée en paragraphes, avec des explications riches et précises.`;
+        // Adapter le ton et la mise en forme selon l'âge de l'utilisateur
+        let introMessage = `En tant que tuteur pédagogique s'adressant à ${body.name} (${body.age}), explique de façon claire et engageante : ${body.question}.
+        Assure-toi d'utiliser les balises HTML pour formater correctement les réponses :
+        1. Mets en <strong>gras</strong> les mots ou concepts importants.
+        2. Utilise des <strong>titres</strong> ou sous-titres pour introduire des sections.
+        3. Utilise l'<em>italique</em> pour ajouter de l'emphase.
+        4. Pour les mots techniques, utilise des balises de lien <u>souligné</u> et propose plus d'explications si l'utilisateur clique dessus.`;
 
-        // Adapter le ton en fonction de l'âge, mais garder un style friendly et engageant avec des emojis pour tous les âges
         if (body.age === 'enfant') {
             introMessage += `
-Instructions pour un enfant (6-11 ans) :
-1. Utilise un ton **très enthousiaste** avec **beaucoup d'emojis**. 🎉🤩
-2. Fais des analogies simples et amusantes, comme comparer le Soleil à une "énorme boule de feu". ☀️🔥
-3. Explique chaque concept avec des phrases courtes et claires.
-4. Encourage la curiosité en posant des questions comme "Tu veux en savoir plus ? 😊".`;
+            Instructions pour un enfant :
+            1. Utilise un ton très enthousiaste avec BEAUCOUP d'emojis 🎉.
+            2. Explique les concepts en utilisant des phrases simples et courtes.
+            3. Mets en <strong>gras</strong> les mots simples mais importants comme "soleil", "énergie", "chaud".
+            4. Utilise des comparaisons amusantes (ex. jouets, animaux, jeux).`;
 
         } else if (body.age === 'ado') {
             introMessage += `
-Instructions pour un adolescent (12-15 ans) :
-1. Utilise un ton **amical et engageant**, avec des **emojis modérés**. 💡⚡
-2. Donne des analogies pertinentes pour leur âge, comme des comparaisons avec la technologie ou les réseaux sociaux.
-3. Introduis des termes techniques simples mais expliques-les brièvement pour qu'ils comprennent bien.`;
+            Instructions pour un adolescent :
+            1. Utilise un ton amical et engageant 💡.
+            2. Utilise des analogies pertinentes (sports, technologie).
+            3. Introduis des termes techniques avec des mots en <strong>gras</strong> pour souligner leur importance, et <u>souligner</u> les liens vers d'autres concepts.`;
 
         } else if (body.age === 'lyceen') {
             introMessage += `
-Instructions pour un lycéen (16-18 ans) :
-1. Utilise un ton **respectueux mais engageant**. 📘
-2. Donne des explications plus détaillées, avec des exemples un peu plus complexes, mais garde des analogies accessibles.
-3. N'hésite pas à poser des questions pour stimuler la curiosité.`;
+            Instructions pour un lycéen :
+            1. Utilise un ton respectueux et structuré 📚.
+            2. Explique les concepts avec un peu plus de profondeur.
+            3. Utilise des exemples et des analogies plus sophistiqués, en mettant les points clés en <strong>gras</strong>.`;
 
         } else if (body.age === 'adulte') {
             introMessage += `
-Instructions pour un adulte (18+ ans) :
-1. Utilise un ton **amical et professionnel**, mais toujours engageant. 🌍
-2. Structure bien les explications en paragraphes détaillés.
-3. Utilise des emojis pour illustrer ou rendre l'explication plus visuelle (ex: 🌞 pour le Soleil, ⚛️ pour la science).`;
+            Instructions pour un adulte :
+            1. Utilise un ton professionnel et amical 🌍.
+            2. Structure l'explication en plusieurs points clairs et détaillés, en mettant en <strong>gras</strong> les concepts principaux.
+            3. Utilise des exemples concrets de la vie quotidienne.
+            4. Utilise <em>peu ou pas d'emojis</em>, sauf s'ils ajoutent de la valeur.`;
         }
 
         // Ajouter l'historique des messages
@@ -65,7 +70,7 @@ Instructions pour un adulte (18+ ans) :
                 'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
             },
             body: JSON.stringify({
-                model: "chatgpt-4o-latest",
+                model: "gpt-4",  // Modification pour utiliser GPT-4
                 messages: messages,
                 temperature: 0.7,
                 max_tokens: 800
@@ -78,7 +83,7 @@ Instructions pour un adulte (18+ ans) :
 
         const data = await openaiResponse.json();
         
-        // Retourner la réponse de GPT
+        // Retourner la réponse de GPT avec les balises HTML pour le formatage
         return new Response(JSON.stringify({
             response: data.choices[0].message.content,
             messages: [...body.messages, { role: 'assistant', content: data.choices[0].message.content }] // Ajout de la réponse dans l'historique
