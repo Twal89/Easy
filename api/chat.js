@@ -19,7 +19,7 @@ export default async function handler(req) {
 
         // Si c'est une réponse à un QCM
         if (body.question.startsWith('Response:')) {
-            const prompt = `En tant que tuteur pédagogique super enthousiaste répondant à ${body.name}, évalue sa réponse au QCM : ${body.question}
+            const prompt = `En tant que tuteur pédagogique super enthousiaste répondant à ${body.name}, évalue sa réponse : ${body.question}
 
 Instructions importantes :
 1. Commence DIRECTEMENT par une réaction spontanée et encourageante :
@@ -28,16 +28,20 @@ Instructions importantes :
 2. Donne une explication détaillée et encourageante avec BEAUCOUP d'emojis
 3. Utilise des analogies simples et amusantes
 4. Garde un ton super positif et amical
-5. Termine par une nouvelle question QCM amusante
+5. Termine par un nouveau QCM amusant
 
 Format de réponse souhaité :
-[Réaction] 🌟
-[Explication avec emojis]
+[Réaction] ⭐
 
-[Nouvelle Question] 📝
-A) [Option fun] 🔵
-B) [Option fun] 🟢
-C) [Option fun] 🟡`;
+[Explication avec emojis et analogies]
+
+[QCM]
+Question : Une nouvelle question amusante ? 📝
+- Une première option super intéressante 🔵
+- Une deuxième option qui fait réfléchir 🟢
+- Une troisième option qui complète bien 🟡
+
+À toi de jouer ! ✨`;
 
             const response = await fetch('https://api.openai.com/v1/chat/completions', {
                 method: 'POST',
@@ -77,20 +81,21 @@ Instructions essentielles :
 1. Commence par une introduction super accueillante avec des emojis 👋 ⭐
 2. Utilise BEAUCOUP d'emojis pertinents tout au long de l'explication 🌟 ✨
 3. Chaque concept doit être expliqué avec une analogie amusante du quotidien 🎯
-4. TOUS les termes techniques doivent être expliqués simplement 📚
-5. Adapte ton langage à l'âge tout en restant super dynamique 🎈
+4. TOUS les termes techniques doivent être expliqués simplement, comme si tu parlais à un ami 📚
+5. Adapte ton langage à l'âge tout en restant super dynamique et sympa 🎈
 6. Pose des mini-questions rhétoriques pour maintenir l'engagement 🤔
 7. Termine par un QCM ludique et amusant 🎮
 
 Format de réponse souhaité :
-[Introduction amicale avec emojis]
+Hey ${body.name} ! 👋
 
 [Explication principale avec beaucoup d'emojis et d'analogies]
 
-[Question finale] 📝
-A) [Option fun] 🔵
-B) [Option fun] 🟢
-C) [Option fun] 🟡
+[QCM]
+Question : Une question amusante sur ce qu'on vient d'apprendre ? 📝
+- Une première option intéressante 🔵
+- Une deuxième option captivante 🟢
+- Une troisième option fascinante 🟡
 
 À toi de jouer ! ✨`;
 
