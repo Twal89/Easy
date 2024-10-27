@@ -17,12 +17,16 @@ export default async function handler(req) {
             throw new Error('API key not configured');
         }
 
-        // Adapter le ton en fonction de l'âge de l'utilisateur et détecter les termes techniques
-        let introMessage = `En tant que tuteur pédagogique s'adressant à ${body.name} (${body.age}), explique de façon claire et engageante : ${body.question}.
+        // Adapter le ton et demander une large détection des termes techniques
+        let introMessage = `En tant que tuteur pédagogique s'adressant à ${body.name} (${body.age}), explique de façon claire, riche, et engageante la réponse suivante : ${body.question}.
         
-        - Détecte automatiquement les mots techniques ou complexes dans ta réponse.
-        - Répertorie les mots techniques en les entourant de balises [TERM] et [/TERM].
-        - Garde un ton adapté à l'âge (${body.age}) et à la question initiale.`;
+        - Utilise un ton adapté à l'âge de ${body.age}, incluant des explications détaillées et des emojis si nécessaire.
+        - Les termes techniques (concepts scientifiques, termes spécifiques à un domaine) doivent être détectés largement, entourés de balises [TERM] et [/TERM].
+        - Structure la réponse en plusieurs paragraphes explicatifs pour que chaque section soit claire.
+        - Ajoute des emojis pertinents pour rendre l'explication plus vivante.
+        - Assure-toi de garder un niveau d'explication adapté à l'âge de l'utilisateur (${body.age}).
+
+        Reprends bien ces instructions tout au long de la réponse.`;
 
         const messages = [
             { role: 'system', content: introMessage },
