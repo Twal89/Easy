@@ -17,16 +17,16 @@ export default async function handler(req) {
             throw new Error('API key not configured');
         }
 
-        // Adapter le ton et demander une large détection des termes techniques
-        let introMessage = `En tant que tuteur pédagogique s'adressant à ${body.name} (${body.age}), explique de façon claire, riche, et engageante la réponse suivante : ${body.question}.
+        // Adapter le ton et insister sur les réponses fluides et contextuelles
+        let introMessage = `En tant que tuteur pédagogique, continue la conversation de manière fluide et engageante avec ${body.name} (${body.age}). Réponds à sa question avec des explications claires et détaillées : ${body.question}.
         
-        - Utilise un ton adapté à l'âge de ${body.age}, incluant des explications détaillées et des emojis si nécessaire.
-        - Les termes techniques (concepts scientifiques, termes spécifiques à un domaine) doivent être détectés largement, entourés de balises [TERM] et [/TERM].
-        - Structure la réponse en plusieurs paragraphes explicatifs pour que chaque section soit claire.
-        - Ajoute des emojis pertinents pour rendre l'explication plus vivante.
-        - Assure-toi de garder un niveau d'explication adapté à l'âge de l'utilisateur (${body.age}).
+        - Les réponses doivent être cohérentes avec les messages précédents, sans réintroduire formellement le nom de l'utilisateur.
+        - Assure-toi que chaque réponse fait un lien logique avec le fil de la discussion précédente.
+        - Identifie et souligne les termes techniques avec des balises [TERM] et [/TERM].
+        - Structure la réponse en paragraphes bien distincts avec des emojis si nécessaire.
+        - Utilise un ton adapté à l'âge (${body.age}).
 
-        Reprends bien ces instructions tout au long de la réponse.`;
+        Voici l'historique de la conversation :`;
 
         const messages = [
             { role: 'system', content: introMessage },
@@ -55,9 +55,9 @@ export default async function handler(req) {
         const data = await openaiResponse.json();
 
         // Ajouter un console.log pour voir la réponse renvoyée par GPT
-        console.log(data.response); // Ceci affichera la réponse avec les termes entourés de balises [TERM]
+        console.log(data.response);
 
-        // Retourner la réponse de GPT avec les mots techniques
+        // Retourner la réponse de GPT avec les mots techniques soulignés
         return new Response(JSON.stringify({
             response: data.choices[0].message.content,
             messages: [...body.messages, { role: 'assistant', content: data.choices[0].message.content }]
