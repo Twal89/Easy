@@ -188,90 +188,81 @@
         </main>
     </div>
 
-    <script>
-        let userName = '';
-        let userAge = '';
-        let selectedQuizOption = null;
+<script>
+    document.getElementById('questionForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
 
-        // Gestion du formulaire principal
-        document.getElementById('questionForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
+        userName = document.getElementById('name').value;
+        userAge = document.getElementById('age').value;
+        const question = document.getElementById('question').value;
+        const responseDiv = document.getElementById('response');
+        const chatContainer = document.getElementById('chat-container');
 
-            userName = document.getElementById('name').value;
-            userAge = document.getElementById('age').value;
-            const question = document.getElementById('question').value;
-            const responseDiv = document.getElementById('response');
-            const chatContainer = document.getElementById('chat-container');
+        // Afficher la question
+        chatContainer.innerHTML += `
+            <div class="user-bubble">
+                <strong>Ma question :</strong><br>
+                ${question}
+            </div>
+        `;
 
-            // Afficher la question
+        // Afficher le chargement
+        chatContainer.innerHTML += `
+            <div class="response-bubble" id="loading-message">
+                <span class="loading-indicator">Je réfléchis <span class="emoji-bounce">🤔</span></span>
+            </div>
+        `;
+        
+        responseDiv.classList.remove('hidden');
+
+        try {
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: userName,
+                    age: userAge,
+                    question
+                })
+            });
+
+            const data = await response.json();
+            const explanation = data.explanation;
+            const qcmPart = data.qcm;
+
+            // Supprimer le chargement
+            document.getElementById('loading-message').remove();
+        
+            // Afficher l'explication
             chatContainer.innerHTML += `
-                <div class="user-bubble">
-                    <strong>Ma question :</strong><br>
-                    ${question}
+                <div class="response-bubble">
+                    ${explanation.trim().replace(/\n/g, '<br>')}
                 </div>
             `;
 
-            // Afficher le chargement
-            chatContainer.innerHTML += `
-                <div class="response-bubble" id="loading-message">
-                    <span class="loading-indicator">Je réfléchis <span class="emoji-bounce">🤔</span></span>
-                </div>
-            `;
-            
-            responseDiv.classList.remove('hidden');
-
-            try {
-                const response = await fetch('/api/chat', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        name: userName,
-                        age: userAge,
-                        question
-                    })
-                });
-            
-                const data = await response.json();
-                const explanation = data.choices[0].message.content;
-
-                // Supprimer le chargement
-                document.getElementById('loading-message').remove();
-            
-                // Séparer l'explication du QCM
-                const parts = explanation.split('[QCM]');
-                const mainExplanation = parts[0];
-                const qcmPart = parts[1];
-
-                // Afficher l'explication
-                chatContainer.innerHTML += `
-                    <div class="response-bubble">
-                        ${mainExplanation.trim().replace(/\n/g, '<br>')}
-                    </div>
-                `;
-
-                // Traiter et afficher le QCM si présent
-                if (qcmPart) {
-                    const lines = qcmPart.trim().split('\n');
-                    const question = lines[0].replace('Question :', '').trim();
-                    const options = lines.slice(1)
-                        .filter(line => line.trim().startsWith('-'))
-                        .map(line => line.replace(/^-\s*/, '').trim());
-                    
-                    displayQuizOptions(question, options);
-                }
-
-            } catch (error) {
-                console.error('Erreur:', error);
-                document.getElementById('loading-message').remove();
-                chatContainer.innerHTML += `
-                    <div class="response-bubble text-red-600">
-                        Oups ! Une erreur s'est produite. On réessaie ? <span class="emoji-bounce">😅</span>
-                    </div>
-                `;
+            // Traiter et afficher le QCM si présent
+            if (qcmPart) {
+                const lines = qcmPart.trim().split('\n');
+                const question = lines[0].replace('Question :', '').trim();
+                const options = lines.slice(1)
+                    .filter(line => line.trim().startsWith('-'))
+                    .map(line => line.replace(/^-\s*/, '').trim());
+                
+                displayQuizOptions(question, options);
             }
-        });
+
+        } catch (error) {
+            console.error('Erreur:', error);
+            document.getElementById('loading-message').remove();
+            chatContainer.innerHTML += `
+                <div class="response-bubble text-red-600">
+                    Oups ! Une erreur s'est produite. On réessaie ? <span class="emoji-bounce">😅</span>
+                </div>
+            `;
+        }
+    });
 
         // Affichage des options du QCM
         function displayQuizOptions(question, options) {
