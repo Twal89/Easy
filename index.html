@@ -340,116 +340,144 @@
             }
         });
 
-        function displayQuizOptions(question, options) {
-            const quizContainer = document.getElementById('quiz-container');
-            const quizOptions = document.getElementById('quiz-options');
-            
-            // Nettoyer les options existantes
-            quizOptions.innerHTML = '';
-            
-            // Ajouter la question
-            quizOptions.insertAdjacentHTML('beforebegin', `
-                <div class="mb-4 font-medium text-gray-900">
-                    ${question} 📝
-                </div>
-            `);
-            
-            // Ajouter les options
-            options.forEach((option, index) => {
-                const optionElement = document.createElement('div');
-                optionElement.className = 'quiz-option';
-                optionElement.innerHTML = `
-                    <label class="flex items-center w-full">
-                        <input type="radio" 
-                            name="quiz-answer" 
-                            value="${option}"
-                            class="mr-3"
-                            onclick="handleOptionSelect(this)">
-                        <span class="flex-1">
-                            ${String.fromCharCode(65 + index)}) ${option}
-                        </span>
-                    </label>
-                `;
-                quizOptions.appendChild(optionElement);
-            });
+// Dans votre index.html, remplacez la partie qui gère le QCM par ce code :
 
-            quizContainer.classList.remove('hidden');
-        }
+function displayQuizOptions(options) {
+    const quizContainer = document.getElementById('quiz-container');
+    const quizOptions = document.getElementById('quiz-options');
+    
+    // Extraire la question et les options
+    const questionMatch = options.find(opt => opt.includes('Question :'));
+    const question = questionMatch ? questionMatch.replace('Question :', '').trim() : 'Question :';
+    
+    // Filtrer pour n'avoir que les options (commençant par -)
+    const choices = options.filter(opt => opt.trim().startsWith('-'))
+        .map(opt => opt.replace('-', '').trim());
 
-        function handleOptionSelect(radio) {
-            selectedQuizOption = radio.value;
-
-            // Mise à jour visuelle
-            document.querySelectorAll('.quiz-option').forEach(option => {
-                option.classList.remove('selected');
-            });
-            radio.closest('.quiz-option').classList.add('selected');
-
-            // Afficher le bouton de validation
-            document.getElementById('submit-quiz').classList.remove('hidden');
-        }
-
-        async function submitQuizAnswer() {
-            if (!selectedQuizOption) return;
-
-            const chatContainer = document.getElementById('chat-container');
-            const quizContainer = document.getElementById('quiz-container');
-            
-            // Afficher la réponse sélectionnée
-            chatContainer.innerHTML += `
-                <div class="user-bubble">
-                    <strong>Ma réponse :</strong><br>
-                    ${selectedQuizOption}
-                </div>
-            `;
-
-            // Animation de chargement
-            chatContainer.innerHTML += `
-                <div class="response-bubble" id="loading-message">
-                    <span class="loading-indicator">Je vérifie <span class="emoji-bounce">🤔</span></span>
-                </div>
-            `;
-
-            try {
-                const response = await fetch('/api/chat', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        name: userName,
-                        age: userAge,
-                        question: `Response: "${selectedQuizOption}"`
-                    })
-                });
-            
-                const data = await response.json();
-                const feedback = data.choices[0].message.content;
-
-                // Supprimer le chargement
-                document.getElementById('loading-message').remove();
-                
-                // Afficher le feedback
-                chatContainer.innerHTML += `
-                    <div class="response-bubble">
-                        ${feedback.replace(/\n/g, '<br>')}
+    // Créer le HTML du QCM
+    quizOptions.innerHTML = `
+        <div class="bg-white rounded-lg p-6 shadow-sm">
+            <div class="text-lg font-medium text-gray-800 mb-4">
+                ${question}
+            </div>
+            <div class="space-y-3">
+                ${choices.map((choice, index) => `
+                    <div class="quiz-option">
+                        <label class="flex items-center p-4 border-2 rounded-lg cursor-pointer hover:border-indigo-500 hover:bg-indigo-50 transition-all duration-300">
+                            <span class="relative flex items-center">
+                                <input type="radio" 
+                                    name="quiz-answer" 
+                                    value="${choice}"
+                                    class="form-radio h-5 w-5 text-indigo-600 border-2 border-gray-300 focus:ring-indigo-500"
+                                    onchange="handleOptionSelect(this)">
+                                <span class="absolute w-full h-full flex items-center justify-center text-white"></span>
+                            </span>
+                            <span class="ml-3 text-gray-800">${choice}</span>
+                        </label>
                     </div>
-                `;
+                `).join('')}
+            </div>
+            <button id="submit-quiz" 
+                onclick="submitQuizAnswer()" 
+                class="w-full mt-6 gradient-bg text-white font-bold py-4 px-6 rounded-lg opacity-0 pointer-events-none transition-all duration-300">
+                Valider ma réponse ✨
+            </button>
+        </div>
+    `;
 
-                // Réinitialiser
-                selectedQuizOption = null;
-                quizContainer.classList.add('hidden');
+    quizContainer.classList.remove('hidden');
+}
 
-            } catch (error) {
-                console.error('Erreur:', error);
-                document.getElementById('loading-message').remove();
-                chatContainer.innerHTML += `
-                    <div class="response-bubble text-red-600">
-                        Oups ! Une erreur s'est produite. On réessaie ? <span class="emoji-bounce">😅</span>
-                    </div>
-                `;
-            }
+function handleOptionSelect(radio) {
+    selectedQuizOption = radio.value;
+
+    // Mise à jour visuelle des options
+    document.querySelectorAll('.quiz-option').forEach(option => {
+        const label = option.querySelector('label');
+        if (option.contains(radio)) {
+            label.classList.add('border-indigo-500', 'bg-indigo-50');
+        } else {
+            label.classList.remove('border-indigo-500', 'bg-indigo-50');
         }
+    });
+
+    // Afficher le bouton de validation
+    const submitButton = document.getElementById('submit-quiz');
+    submitButton.classList.remove('opacity-0', 'pointer-events-none');
+    submitButton.classList.add('opacity-100', 'hover:translate-y-[-2px]');
+}
+
+async function submitQuizAnswer() {
+    if (!selectedQuizOption) return;
+
+    const chatContainer = document.getElementById('chat-container');
+    const quizContainer = document.getElementById('quiz-container');
+    
+    // Afficher la réponse sélectionnée
+    chatContainer.innerHTML += `
+        <div class="user-bubble">
+            <strong>Ma réponse :</strong><br>
+            ${selectedQuizOption}
+        </div>
+    `;
+
+    // Animation de chargement
+    chatContainer.innerHTML += `
+        <div class="response-bubble" id="loading-message">
+            <span class="loading-indicator">Je vérifie ta réponse <span class="emoji-bounce">🤔</span></span>
+        </div>
+    `;
+
+    try {
+        const response = await fetch('/api/chat', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                name: userName,
+                age: userAge,
+                question: `Response: "${selectedQuizOption}"`
+            })
+        });
+    
+        const data = await response.json();
+        const feedback = data.choices[0].message.content;
+
+        // Supprimer le message de chargement
+        document.getElementById('loading-message').remove();
+        
+        // Séparer le feedback et le nouveau QCM
+        const [mainFeedback, newQcmPart] = feedback.split('[QCM]');
+
+        // Afficher le feedback
+        chatContainer.innerHTML += `
+            <div class="response-bubble">
+                ${mainFeedback.trim().replace(/\n/g, '<br>')}
+            </div>
+        `;
+
+        // Afficher le nouveau QCM si présent
+        if (newQcmPart) {
+            const options = newQcmPart.trim().split('\n')
+                .filter(line => line.trim().length > 0);
+            displayQuizOptions(options);
+        }
+
+    } catch (error) {
+        console.error('Erreur:', error);
+        document.getElementById('loading-message').remove();
+        chatContainer.innerHTML += `
+            <div class="response-bubble text-red-600">
+                Oups ! Une erreur s'est produite. On réessaie ? <span class="emoji-bounce">😅</span>
+            </div>
+        `;
+    }
+
+    // Réinitialiser la sélection
+    selectedQuizOption = null;
+    quizContainer.classList.add('hidden');
+}
 
         function resetConversation() {
             document.getElementById('question').value = '';
