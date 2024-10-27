@@ -24,48 +24,63 @@
             font-size: 1.1rem;
             text-align: justify;
         }
+
+        /* Styles spécifiques pour le QCM */
         .quiz-option {
             border: 2px solid #e5e7eb;
             border-radius: 0.75rem;
-            transition: all 0.3s ease;
-            position: relative;
+            margin-bottom: 0.75rem;
             overflow: hidden;
+            transition: all 0.3s ease;
         }
+
+        .quiz-option label {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            cursor: pointer;
+            width: 100%;
+        }
+
         .quiz-option:hover {
             border-color: #818cf8;
             background-color: #f5f7ff;
         }
+
         .quiz-option input[type="radio"] {
-            appearance: none;
             -webkit-appearance: none;
-            -moz-appearance: none;
-            width: 1.2rem;
-            height: 1.2rem;
+            appearance: none;
+            width: 1.5rem;
+            height: 1.5rem;
             border: 2px solid #6366f1;
             border-radius: 50%;
-            margin-right: 0.5rem;
+            margin-right: 1rem;
             position: relative;
             cursor: pointer;
             transition: all 0.2s ease;
         }
+
         .quiz-option input[type="radio"]:checked {
             background-color: #6366f1;
         }
-        .quiz-option input[type="radio"]:checked::after {
-            content: '';
+
+        .quiz-option input[type="radio"]:checked::before {
+            content: "";
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 0.4rem;
-            height: 0.4rem;
+            width: 0.5rem;
+            height: 0.5rem;
             background-color: white;
             border-radius: 50%;
         }
+
         .quiz-option.selected {
             border-color: #6366f1;
             background-color: #f0f7ff;
         }
+
         .response-bubble {
             background-color: #f3f4f6;
             border-radius: 1rem;
@@ -75,6 +90,7 @@
             animation: fadeIn 0.5s ease-out;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
+
         .user-bubble {
             background-color: #e0e7ff;
             border-radius: 1rem;
@@ -86,45 +102,42 @@
             animation: fadeIn 0.5s ease-out;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
+
         .image-preview {
             max-width: 100%;
             border-radius: 0.5rem;
             margin-top: 1rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
+
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
         .loading-indicator {
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
         }
+
         .loading-indicator::after {
             content: '...';
             animation: dots 1.5s steps(4, end) infinite;
             width: 1.5em;
         }
+
         @keyframes dots {
             0%, 20% { content: '.'; }
             40% { content: '..'; }
             60% { content: '...'; }
             80%, 100% { content: ''; }
         }
-        /* Styles pour les boutons d'action */
-        .action-button {
-            transition: all 0.3s ease;
-            transform: translateY(0);
-        }
-        .action-button:hover {
-            transform: translateY(-2px);
-        }
-        /* Animation pour les emojis */
+
         .emoji-bounce {
             display: inline-block;
             animation: bounce 0.6s ease infinite;
         }
+
         @keyframes bounce {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-3px); }
@@ -202,26 +215,17 @@
                 <!-- Zone de QCM -->
                 <div id="quiz-container" class="mt-6 hidden">
                     <div class="bg-white rounded-lg p-4 shadow-sm border border-indigo-100">
+                        <div class="mb-4 font-medium text-gray-900">
+                            <!-- La question sera ajoutée ici -->
+                        </div>
                         <div id="quiz-options" class="space-y-3">
-                            <!-- Les options QCM seront générées ici -->
+                            <!-- Les options QCM seront ajoutées ici -->
                         </div>
                         <button id="submit-quiz" onclick="submitQuizAnswer()" 
                             class="w-full mt-4 gradient-bg text-white font-bold py-3 px-4 rounded-md hover:opacity-90 transition duration-300 hidden">
                             Valider ma réponse <span class="emoji-bounce">✨</span>
                         </button>
                     </div>
-                </div>
-
-                <!-- Boutons d'action -->
-                <div id="action-buttons" class="mt-6 space-y-3 hidden">
-                    <button onclick="resetConversation()" 
-                        class="w-full py-3 px-4 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-lg transition-colors action-button">
-                        <span class="emoji-bounce">🔄</span> Nouvelle question
-                    </button>
-                    <button onclick="askFollowUp()" 
-                        class="w-full py-3 px-4 gradient-bg text-white rounded-lg hover:opacity-90 transition-colors action-button">
-                        <span class="emoji-bounce">🚀</span> Approfondir ce sujet
-                    </button>
                 </div>
             </div>
         </main>
@@ -247,7 +251,7 @@
             }
         });
 
-        // Gestion du formulaire de question
+        // Gestion du formulaire principal
         document.getElementById('questionForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
@@ -257,7 +261,7 @@
             const responseDiv = document.getElementById('response');
             const chatContainer = document.getElementById('chat-container');
 
-            // Afficher la question avec une animation
+            // Afficher la question
             chatContainer.innerHTML += `
                 <div class="user-bubble">
                     <strong>Ma question :</strong><br>
@@ -273,7 +277,7 @@
                 `;
             }
 
-            // Afficher l'animation de chargement
+            // Afficher le chargement
             chatContainer.innerHTML += `
                 <div class="response-bubble" id="loading-message">
                     <span class="loading-indicator">Je réfléchis <span class="emoji-bounce">🤔</span></span>
@@ -299,30 +303,35 @@
                 const data = await response.json();
                 const explanation = data.choices[0].message.content;
 
-                // Supprimer le message de chargement
+                // Supprimer le chargement
                 document.getElementById('loading-message').remove();
             
-                // Séparer l'explication et le QCM
-                const [mainExplanation, qcmPart] = explanation.split('[QCM]');
+                // Séparer l'explication du QCM
+                const parts = explanation.split('[QCM]');
+                const mainExplanation = parts[0];
+                const qcmPart = parts[1];
 
-                // Afficher l'explication principale
+                // Afficher l'explication
                 chatContainer.innerHTML += `
                     <div class="response-bubble">
                         ${mainExplanation.trim().replace(/\n/g, '<br>')}
                     </div>
                 `;
 
-                // Traiter et afficher le QCM
+                // Traiter et afficher le QCM si présent
                 if (qcmPart) {
-                    const options = qcmPart.trim().split('\n')
-                        .filter(line => line.trim().startsWith('-') || line.trim().startsWith('A)') || line.trim().startsWith('B)') || line.trim().startsWith('C)'))
-                        .map(line => line.replace(/^[-ABC)\s]+/, '').trim());
+                    const lines = qcmPart.trim().split('\n');
+                    const question = lines[0].replace('Question :', '').trim();
+                    const options = lines.slice(1)
+                        .filter(line => line.trim().startsWith('-'))
+                        .map(line => line.replace(/^-\s*/, '').trim());
                     
-                    displayQuizOptions(options);
+                    displayQuizOptions(question, options);
                 }
 
             } catch (error) {
                 console.error('Erreur:', error);
+                document.getElementById('loading-message').remove();
                 chatContainer.innerHTML += `
                     <div class="response-bubble text-red-600">
                         Oups ! Une erreur s'est produite. On réessaie ? <span class="emoji-bounce">😅</span>
@@ -331,47 +340,53 @@
             }
         });
 
-        function displayQuizOptions(options) {
+        function displayQuizOptions(question, options) {
             const quizContainer = document.getElementById('quiz-container');
             const quizOptions = document.getElementById('quiz-options');
             
-            // Nouveau format pour les options QCM
-            quizOptions.innerHTML = `
-                <div class="space-y-3">
-                    ${options.map((option, index) => `
-                        <div class="quiz-option bg-white p-4 rounded-lg">
-                            <label class="flex items-center w-full cursor-pointer">
-                                <input type="radio" 
-                                    name="quiz-answer" 
-                                    value="${option}"
-                                    class="form-radio h-5 w-5 text-indigo-600" 
-                                    onclick="handleOptionSelect(this)">
-                                <span class="ml-3 block text-gray-800">
-                                    ${String.fromCharCode(65 + index)}) ${option}
-                                </span>
-                            </label>
-                        </div>
-                    `).join('')}
+            // Nettoyer les options existantes
+            quizOptions.innerHTML = '';
+            
+            // Ajouter la question
+            quizOptions.insertAdjacentHTML('beforebegin', `
+                <div class="mb-4 font-medium text-gray-900">
+                    ${question} 📝
                 </div>
-            `;
-        
-            // Afficher le conteneur QCM
+            `);
+            
+            // Ajouter les options
+            options.forEach((option, index) => {
+                const optionElement = document.createElement('div');
+                optionElement.className = 'quiz-option';
+                optionElement.innerHTML = `
+                    <label class="flex items-center w-full">
+                        <input type="radio" 
+                            name="quiz-answer" 
+                            value="${option}"
+                            class="mr-3"
+                            onclick="handleOptionSelect(this)">
+                        <span class="flex-1">
+                            ${String.fromCharCode(65 + index)}) ${option}
+                        </span>
+                    </label>
+                `;
+                quizOptions.appendChild(optionElement);
+            });
+
             quizContainer.classList.remove('hidden');
-            // Cacher le bouton de validation jusqu'à ce qu'une option soit sélectionnée
-            document.getElementById('submit-quiz').classList.add('hidden');
         }
 
         function handleOptionSelect(radio) {
             selectedQuizOption = radio.value;
-            document.getElementById('submit-quiz').classList.remove('hidden');
 
-            // Mise en évidence de l'option sélectionnée
+            // Mise à jour visuelle
             document.querySelectorAll('.quiz-option').forEach(option => {
                 option.classList.remove('selected');
-                if (option.contains(radio)) {
-                    option.classList.add('selected');
-                }
             });
+            radio.closest('.quiz-option').classList.add('selected');
+
+            // Afficher le bouton de validation
+            document.getElementById('submit-quiz').classList.remove('hidden');
         }
 
         async function submitQuizAnswer() {
@@ -380,7 +395,7 @@
             const chatContainer = document.getElementById('chat-container');
             const quizContainer = document.getElementById('quiz-container');
             
-            // Afficher la réponse de l'utilisateur
+            // Afficher la réponse sélectionnée
             chatContainer.innerHTML += `
                 <div class="user-bubble">
                     <strong>Ma réponse :</strong><br>
@@ -421,8 +436,9 @@
                     </div>
                 `;
 
-                // Afficher les boutons d'action
-                document.getElementById('action-buttons').classList.remove('hidden');
+                // Réinitialiser
+                selectedQuizOption = null;
+                quizContainer.classList.add('hidden');
 
             } catch (error) {
                 console.error('Erreur:', error);
@@ -433,10 +449,6 @@
                     </div>
                 `;
             }
-
-            // Réinitialiser et cacher le QCM
-            selectedQuizOption = null;
-            quizContainer.classList.add('hidden');
         }
 
         function resetConversation() {
@@ -444,7 +456,6 @@
             document.getElementById('chat-container').innerHTML = '';
             document.getElementById('response').classList.add('hidden');
             document.getElementById('quiz-container').classList.add('hidden');
-            document.getElementById('action-buttons').classList.add('hidden');
             document.getElementById('image-preview-container').classList.add('hidden');
             imageData = null;
             window.scrollTo(0, 0);
