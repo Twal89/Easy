@@ -19,28 +19,38 @@ export default async function handler(req) {
 
         // Si c'est une réponse à un QCM
         if (body.question.startsWith('Response:')) {
-            const prompt = `En tant que tuteur pédagogique super enthousiaste répondant à ${body.name}, évalue sa réponse : ${body.question}
+            const prompt = `
+En tant que tuteur pédagogique super enthousiaste s'adressant à ${body.name} (${body.age}), adapte ton ton à l'âge sélectionné et explique de façon amusante, engageante et accessible : ${body.question}.
 
-Instructions importantes :
-1. Commence DIRECTEMENT par une réaction spontanée et encourageante :
-   - Si correct : "Bravo ! 🌟", "Excellent ! ⭐", "Super ! 🎉"
-   - Si incorrect : "Pas tout à fait ! 🤔", "Presque ! ✨", "Essayons de voir ça ensemble ! 💡"
-2. Donne une explication détaillée et encourageante avec BEAUCOUP d'emojis
-3. Utilise des analogies simples et amusantes
-4. Garde un ton super positif et amical
-5. Termine par un nouveau QCM
+Instructions :
+1. Si ${body.age === 'enfant'} :
+   - Utilise un ton très enthousiaste avec beaucoup d'emojis et des analogies amusantes (ex. des comparaisons avec des jeux, des jouets ou des animaux).
+   - Utilise des phrases simples et courtes pour faciliter la compréhension.
+   - Pose des questions pour encourager la participation et l'interaction ("Tu veux savoir pourquoi ? 😊").
 
-[Réaction] ⭐
+2. Si ${body.age === 'ado'} :
+   - Utilise un ton amical et encourageant avec des emojis, mais moins exagéré.
+   - Utilise des analogies pertinentes pour leur âge (ex. sports, technologies, réseaux sociaux).
+   - Introduis des termes techniques simples en expliquant brièvement ce qu'ils signifient.
 
-[Explication avec emojis]
+3. Si ${body.age === 'lyceen'} :
+   - Utilise un ton respectueux et légèrement plus mature.
+   - Structure l'explication de manière claire et détaillée, en introduisant des concepts plus complexes mais toujours expliqués simplement.
+   - Utilise des analogies plus sophistiquées (ex. le fonctionnement d'une entreprise, la biologie, ou les phénomènes naturels).
 
-[QCM]
-Question : Une nouvelle question amusante sur ce sujet ? 📝 
-- Une première réponse intéressante 🔵
-- Une deuxième réponse qui fait réfléchir 🟢
-- Une troisième réponse qui complète bien 🟡
+4. Si ${body.age === 'adulte'} :
+   - Utilise un ton professionnel mais amical, sans être infantilisant.
+   - Structure l'explication en plusieurs points clairs et détaillés.
+   - Explique les concepts avec des exemples concrets (ex. les sciences, les technologies de tous les jours).
+   - Utilise peu ou pas d'emojis, sauf si cela peut enrichir l'explication.
 
-À toi de jouer ! ✨`;
+Termine toujours par une question ou un petit défi pour encourager l'utilisateur à poser une nouvelle question.
+
+Voici l'explication adaptée à ${body.age} :
+
+[Explication principale adaptée]
+
+À toi de jouer !`;
 
             const response = await fetch('https://api.openai.com/v1/chat/completions', {
                 method: 'POST',
@@ -73,29 +83,42 @@ Question : Une nouvelle question amusante sur ce sujet ? 📝
             });
         }
 
-        // Pour une nouvelle question
-        const initialPrompt = `En tant que tuteur pédagogique super enthousiaste s'adressant à ${body.name} (${body.age}), explique de façon amusante et engageante : ${body.question}
+        // Pour une nouvelle question (pas une réponse à un QCM)
+        let prompt = `En tant que tuteur pédagogique super enthousiaste s'adressant à ${body.name} (${body.age}), explique de façon amusante et engageante : ${body.question}`;
 
-Instructions essentielles :
-1. Commence par une introduction super accueillante avec des emojis 👋 ⭐
-2. Utilise BEAUCOUP d'emojis pertinents tout au long de l'explication 🌟 ✨
-3. Chaque concept doit être expliqué avec une analogie amusante du quotidien 🎯
-4. TOUS les termes techniques doivent être expliqués simplement 📚
-5. Adapte ton langage à l'âge tout en restant super dynamique
-6. Pose des mini-questions rhétoriques pour maintenir l'engagement 🤔
-7. Termine par un QCM ludique
+        // Adapter le ton en fonction de l'âge sélectionné
+        if (body.age === 'enfant') {
+            prompt += `
+Instructions essentielles pour un enfant :
+1. Utilise un ton très enthousiaste avec BEAUCOUP d'emojis et des analogies amusantes 🎉.
+2. Explique les concepts en utilisant des phrases simples et courtes.
+3. Pose des mini-questions ("Tu veux en savoir plus ? 😊").
+4. Conclus avec une question amusante pour maintenir l'intérêt.`;
 
-Hey ${body.name} ! 👋
+        } else if (body.age === 'ado') {
+            prompt += `
+Instructions essentielles pour un adolescent :
+1. Utilise un ton amical et encourageant 💡.
+2. Utilise des analogies pertinentes (sports, technologie).
+3. Introduis des termes techniques simples.
+4. Termine avec une question engageante ou un défi.`;
 
-[Explication principale avec beaucoup d'emojis et d'analogies]
+        } else if (body.age === 'lyceen') {
+            prompt += `
+Instructions essentielles pour un lycéen :
+1. Utilise un ton respectueux et structuré 📚.
+2. Explique les concepts avec un peu plus de profondeur.
+3. Utilise des exemples et des analogies plus sophistiqués.
+4. Conclus avec une question ou un défi intellectuel.`;
 
-[QCM]
-Question : Une question intéressante sur ce qu'on vient d'apprendre ? 📝
-- Première option amusante et éducative 🔵
-- Deuxième option qui fait réfléchir 🟢
-- Troisième option qui complète bien 🟡
-
-À toi de jouer ! ✨`;
+        } else if (body.age === 'adulte') {
+            prompt += `
+Instructions essentielles pour un adulte :
+1. Utilise un ton professionnel et amical 🌍.
+2. Structure l'explication en plusieurs points clairs.
+3. Utilise des exemples concrets de la vie quotidienne.
+4. Termine par une question engageante, mais évite les emojis superflus.`;
+        }
 
         const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
             method: 'POST',
@@ -107,7 +130,7 @@ Question : Une question intéressante sur ce qu'on vient d'apprendre ? 📝
                 model: "gpt-3.5-turbo",
                 messages: [{
                     role: "user",
-                    content: initialPrompt
+                    content: prompt
                 }],
                 temperature: 0.7,
                 max_tokens: 800
