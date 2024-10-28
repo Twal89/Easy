@@ -2,9 +2,6 @@ export const config = {
     runtime: 'edge',
 };
 
-// Variable pour suivre si c'est la première réponse
-let isFirstResponse = true;
-
 export default async function handler(req) {
     try {
         if (req.method !== 'POST') {
@@ -20,46 +17,48 @@ export default async function handler(req) {
             throw new Error('API key not configured');
         }
 
-        // Adapter le ton en fonction de l'âge de l'utilisateur pour la première réponse uniquement
-        let introMessage = isFirstResponse
-            ? `En tant que tuteur pédagogique s'adressant à ${body.name} (${body.age}), explique de façon claire, structurée et engageante : ${body.question}.`
-            : `${body.question}`;
+        // Variable pour identifier la première réponse
+        const isFirstQuestion = body.messages.length === 0;
 
-        if (body.age === 'enfant') {
-            introMessage += `
+        // Adapter le ton en fonction de l'âge de l'utilisateur
+        let introMessage = `En tant que tuteur pédagogique s'adressant à ${body.name} (${body.age}), explique de façon claire, structurée et engageante : ${body.question}.`;
+
+        if (isFirstQuestion) { // Utiliser le ton d'introduction uniquement pour la première question
+            if (body.age === 'enfant') {
+                introMessage += `
 Instructions pour un enfant :
 1. Utilise un ton très enthousiaste avec BEAUCOUP d'emojis 🎉.
 2. Explique les concepts en utilisant des phrases simples et courtes.
 3. Inclure des sous-titres sous forme de questions pour garder leur attention.
 4. Utilise des listes à puces et des termes en **gras** pour les rendre plus accessibles.`;
-        } else if (body.age === 'ado') {
-            introMessage += `
+            } else if (body.age === 'ado') {
+                introMessage += `
 Instructions pour un adolescent :
 1. Utilise un ton amical et encourageant avec des emojis💡.
 2. Explique les concepts avec des analogies pertinentes.
 3. Ajoute des sous-titres pour structurer l'information.
 4. Utilise des exemples pratiques, des listes et des mots importants en **gras**.`;
-        } else if (body.age === 'lyceen') {
-            introMessage += `
+            } else if (body.age === 'lyceen') {
+                introMessage += `
 Instructions pour un lycéen :
 1. Utilise un ton respectueux et structuré avec des emojis📚.
 2. Introduis des concepts plus avancés en les expliquant simplement.
 3. Utilise des titres pour introduire des sections et des listes à puces pour résumer les idées clés.
 4. Utilise des exemples concrets et des éléments en **gras** pour les points essentiels.`;
-        } else if (body.age === 'adulte') {
-            introMessage += `
+            } else if (body.age === 'adulte') {
+                introMessage += `
 Instructions pour un adulte :
 1. Utilise un ton amical avec des emojis🌍.
 2. Structure l'explication en plusieurs sections avec des sous-titres.
 3. Utilise des **points en gras**, des puces et des exemples concrets pour rendre l'explication plus fluide et lisible.
 4. Utilise quelques emojis pour rendre l'explication plus conviviale, mais sans exagération.`;
+            }
         }
 
         // Historique des messages
-        const messages = [
-            { role: 'system', content: introMessage },
-            ...body.messages
-        ];
+        const messages = isFirstQuestion
+            ? [{ role: 'system', content: introMessage }, ...body.messages]
+            : [...body.messages]; // Pas d'introduction pour les questions suivantes
 
         // Appel à l'API OpenAI
         const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -81,9 +80,6 @@ Instructions pour un adulte :
         }
 
         const data = await openaiResponse.json();
-
-        // Mettre à jour l'état pour supprimer l'introduction sur les prochaines réponses
-        isFirstResponse = false;
 
         // Retourner la réponse formatée
         return new Response(JSON.stringify({
