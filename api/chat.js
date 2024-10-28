@@ -21,7 +21,12 @@ export default async function handler(req) {
         const isFirstResponse = body.messages.length === 1;
 
         // Adapter le ton en fonction de l'âge de l'utilisateur et de la première réponse
-        let introMessage = `En tant que tuteur pédagogique s'adressant à ${body.name} (${body.age}), explique de façon claire, structurée et engageante : ${body.question}.`;
+        let introMessage;
+        if (isFirstResponse) {
+            introMessage = `En tant que tuteur pédagogique s'adressant à ${body.name} (${body.age}), explique de façon claire, structurée et engageante : ${body.question}.`;
+        } else {
+            introMessage = `Explique de manière claire, structurée, et engageante, en suivant le style riche de la première réponse avec des **mots en gras**, des emojis, des titres et des sous-titres, pour continuer la discussion sur ${body.question}. N'inclus aucune introduction comme "Salut" ou "Excellente question".`;
+        }
 
         if (body.age === 'enfant') {
             introMessage += `
@@ -53,9 +58,9 @@ Instructions pour un adulte :
 4. Utilise quelques emojis pour rendre l'explication plus conviviale, mais sans exagération.`;
         }
 
-        // Condition pour inclure ou non l'introduction
+        // Historique des messages
         const messages = [
-            { role: 'system', content: isFirstResponse ? introMessage : `Réponds de façon continue et naturelle sans introduction formelle.` },
+            { role: 'system', content: introMessage },
             ...body.messages
         ];
 
