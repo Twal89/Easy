@@ -47,7 +47,7 @@ Instructions pour un lycéen :
         } else if (body.age === 'adulte') {
             introMessage += `
 Instructions pour un adulte :
-1. Utilise un ton amical et professionnel avec des emojis🌍.
+1. Utilise un ton amical avec des emojis🌍.
 2. Structure l'explication en plusieurs sections avec des sous-titres.
 3. Utilise des **points en gras**, des puces et des exemples concrets pour rendre l'explication plus fluide et lisible.
 4. Utilise quelques emojis pour rendre l'explication plus conviviale, mais sans exagération.`;
